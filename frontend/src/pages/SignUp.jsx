@@ -2,6 +2,9 @@ import { useState } from "react";
 import { FaArrowLeft, FaUserCircle } from "react-icons/fa";
 import logo from "../assets/youtube.png";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { showCustomAlert } from "../components/CustomAlert";
 
 export default function SignUp() {
   const [step, setStep] = useState(1);
@@ -12,16 +15,19 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [backendImage, setBackendImage] = useState(null);
   const [frontendImage, setFrontendImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleNext = () => {
     if (step === 1 && (!userName || !email)) {
-      alert("Fill all the fields");
+      showCustomAlert("Fill all the fields");
       return;
     }
     if (step === 2) {
-      if (!password || !confirmPassword) return alert("Fill all the fields");
-      if (password !== confirmPassword) return alert("Password doesn't match");
+      if (!password || !confirmPassword)
+        return showCustomAlert("Fill all the fields");
+      if (password !== confirmPassword)
+        return showCustomAlert("Password doesn't match");
     }
     setStep(step + 1);
   };
@@ -32,6 +38,31 @@ export default function SignUp() {
     setFrontendImage(URL.createObjectURL(file)); //Browser ke andar temporary URL banta hai
   };
 
+  const handleSignUp = async () => {
+    if (!backendImage) {
+      return showCustomAlert("Please select an image");
+    }
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("userName", userName);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("photoUrl", backendImage);
+    try {
+      const result = await axios.post(
+        serverUrl + "/api/auth/signup",
+        formData,
+        { withCredentials: true }
+      );
+      console.log(result);
+      navigate("/");
+      setLoading(false);
+      showCustomAlert(result.data.message);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-black to-[#181818]">
       <div className="bg-[#202124] rounded-2xl p-8 w-full max-w-md shadow-2xl border border-[#2a2a2a]">
@@ -167,10 +198,30 @@ export default function SignUp() {
                 />
               </label>
             </div>
-
-            <button className="w-full bg-red-600 hover:bg-red-700 transition text-white py-2 rounded font-medium">
-              Create Account
+            <button
+              onClick={handleSignUp}
+              disabled={loading}
+              className={`w-full py-2 rounded font-medium transition flex items-center justify-center gap-2
+    ${loading ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}
+  `}
+            >
+              {loading ? (
+                <>
+                  <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                "Create Account"
+              )}
             </button>
+
+            {/* <button
+              className="w-full bg-red-600 hover:bg-red-700 transition text-white py-2 rounded font-medium"
+              onClick={handleSignUp}
+              disabled={loading}
+            >
+              {loading ? "Please wait" : "Sign Up"}
+            </button> */}
           </>
         )}
       </div>

@@ -20,14 +20,14 @@ export default function SignUp() {
 
   const handleNext = () => {
     if (step === 1 && (!userName || !email)) {
-      showCustomAlert("Fill all the fields");
+      showCustomAlert("Fill all the fields", "error");
       return;
     }
     if (step === 2) {
       if (!password || !confirmPassword)
-        return showCustomAlert("Fill all the fields");
+        return showCustomAlert("Fill all the fields", "error");
       if (password !== confirmPassword)
-        return showCustomAlert("Password doesn't match");
+        return showCustomAlert("Password doesn't match", "error");
     }
     setStep(step + 1);
   };
@@ -40,7 +40,7 @@ export default function SignUp() {
 
   const handleSignUp = async () => {
     if (!backendImage) {
-      return showCustomAlert("Please select an image");
+      return showCustomAlert("Please select an image", "error");
     }
     setLoading(true);
     const formData = new FormData();
@@ -57,7 +57,7 @@ export default function SignUp() {
       console.log(result);
       navigate("/");
       setLoading(false);
-      showCustomAlert(result.data.message);
+      showCustomAlert("Sign Up Successfully", "success");
     } catch (error) {
       console.error(error);
       setLoading(false);
@@ -214,14 +214,6 @@ export default function SignUp() {
                 "Create Account"
               )}
             </button>
-
-            {/* <button
-              className="w-full bg-red-600 hover:bg-red-700 transition text-white py-2 rounded font-medium"
-              onClick={handleSignUp}
-              disabled={loading}
-            >
-              {loading ? "Please wait" : "Sign Up"}
-            </button> */}
           </>
         )}
       </div>

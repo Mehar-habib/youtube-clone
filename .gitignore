@@ -1,0 +1,75 @@
+# Node modules (for both client & server)
+node_modules/
+**/node_modules/
+
+# Build outputs
+build/
+dist/
+.out/
+.next/
+coverage/
+.cache/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Editor / IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp/
+tmp/
+
+# OS generated files
+ehthumbs.db
+Icon?
+desktop.ini
+
+# Debug / Test output
+*.pid
+*.seed
+*.pid.lock
+
+# Package lock files (optional if you prefer clean installs)
+# Uncomment if needed
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# React specific
+client/.env
+client/build
+client/.next
+client/out
+client/coverage
+
+# Server specific
+server/.env
+server/dist
+server/coverage
+
+# Docker / Cache / Misc
+.docker/
+docker-compose.override.yml
+.cache-loader/
+.nyc_output/

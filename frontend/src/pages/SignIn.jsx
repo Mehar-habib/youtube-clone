@@ -1,109 +1,3 @@
-// export default function SignIn() {
-//   const handleNext = () => {
-//       if (step === 1 && ( !email)) {
-//         showCustomAlert("");
-//         return;
-//       }
-//       if (step === 2) {
-//         if (!password)
-//           return showCustomAlert("Fill all the fields");
-//       }
-//       setStep(step + 1);
-//     };
-//   return <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-black to-[#181818]">
-//         <div className="bg-[#202124] rounded-2xl p-8 w-full max-w-md shadow-2xl border border-[#2a2a2a]">
-//           {/* Header */}
-//           <div className="flex items-center gap-3 mb-6">
-//             <button
-//               className="text-gray-400 hover:text-white transition"
-//               onClick={() => (step > 1 ? setStep(step - 1) : navigate("/"))}
-//             >
-//               <FaArrowLeft size={18} />
-//             </button>
-//             <h2 className="text-white text-xl font-semibold">Youtube</h2>
-//           </div>
-
-//           {/* Step indicator */}
-//           <div className="flex justify-between mb-6">
-//             {[1, 2, 3].map((s) => (
-//               <div
-//                 key={s}
-//                 className={`h-1 w-full mx-1 rounded ${
-//                   step >= s ? "bg-red-600" : "bg-gray-600"
-//                 }`}
-//               />
-//             ))}
-//           </div>
-
-//           {/* STEP 1 */}
-//           {step === 1 && (
-//             <>
-//               <h1 className="text-2xl text-white mb-4 flex items-center gap-2">
-//                 <img src={logo} className="w-7 h-7" />
-//                 Sign In
-//               </h1>
-//               <p>with your Account to continue to Youtube</p>
-//               <input
-//                 className="w-full mb-6 px-4 py-2 rounded bg-[#303134] text-white focus:outline-none focus:ring-2 focus:ring-red-600"
-//                 placeholder="Email"
-//                 type="email"
-//                 value={email}
-//                 onChange={(e) => setEmail(e.target.value)}
-//               />
-
-//               <button
-
-//                 className="w-full bg-red-600 hover:bg-red-700 transition text-white py-2 rounded font-medium"
-//               >
-//                 Create Account
-//               </button>
-//               <button>Next</button>
-//             </>
-//           )}
-
-//           {/* STEP 2 */}
-//           {step === 2 && (
-//             <>
-//               <h1 className="text-2xl text-white mb-4 flex items-center gap-2">
-//                 <img src={logo} className="w-7 h-7" />
-//                 Welcome
-//               </h1>
-
-//               <div className="flex items-center gap-2 text-gray-300 mb-4">
-//                 <FaUserCircle size={22} />
-//                 <span>{email}</span>
-//               </div>
-
-//               <input
-//                 type={showPassword ? "text" : "password"}
-//                 placeholder="Password"
-//                 className="w-full mb-3 px-4 py-2 rounded bg-[#303134] text-white focus:ring-2 focus:ring-red-600"
-//                 value={password}
-//                 onChange={(e) => setPassword(e.target.value)}
-//               />
-
-//               <label className="flex items-center gap-2 text-gray-400 mb-5 text-sm">
-//                 <input
-//                   type="checkbox"
-//                   checked={showPassword}
-//                   onChange={() => setShowPassword(!showPassword)}
-//                 />
-//                 Show Password
-//               </label>
-
-//               <button
-//                 className="w-full bg-red-600 hover:bg-red-700 transition text-white py-2 rounded font-medium"
-//               >
-//                 Forgot Passwrd
-//               </button>
-//               <button>Sign In</button>
-//             </>
-//           )}
-
-//         </div>
-//       </div>
-// }
-
 import { useState } from "react";
 import { FaArrowLeft, FaUserCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -111,6 +5,8 @@ import logo from "../assets/youtube.png";
 import { showCustomAlert } from "../components/CustomAlert";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -120,6 +16,7 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const handleNext = () => {
     if (step === 1 && !email) {
@@ -145,6 +42,7 @@ export default function SignIn() {
         { withCredentials: true }
       );
       console.log(result);
+      dispatch(setUserData(result.data));
       navigate("/");
       setLoading(false);
       showCustomAlert("Sign In Successfully", "success");

@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
 import { showCustomAlert } from "../components/CustomAlert";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice";
 
 export default function SignUp() {
   const [step, setStep] = useState(1);
@@ -17,6 +19,7 @@ export default function SignUp() {
   const [frontendImage, setFrontendImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleNext = () => {
     if (step === 1 && (!userName || !email)) {
@@ -55,6 +58,7 @@ export default function SignUp() {
         { withCredentials: true }
       );
       console.log(result);
+      dispatch(setUserData(result.data));
       navigate("/");
       setLoading(false);
       showCustomAlert("Sign Up Successfully", "success");

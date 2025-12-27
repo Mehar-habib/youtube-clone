@@ -23,13 +23,25 @@ export default function CustomAlert() {
     };
   }, []);
 
+  // ✅ AUTO CLOSE AFTER 30 SECONDS
+  useEffect(() => {
+    if (visible) {
+      const timer = setTimeout(() => {
+        setVisible(false);
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [visible]);
+
   if (!visible) return null;
 
   const isError = type === "error";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#202124] border border-[#2a2a2a] rounded-xl shadow-2xl w-full max-w-sm p-6 animate-fadeIn">
+    // ✅ TOP CENTER + 50px FROM TOP
+    <div className="fixed top-[20px] left-1/2 -translate-x-1/2 z-50 w-screen px-4 flex justify-center">
+      <div className="bg-[#202124] border border-[#2a2a2a] rounded-xl shadow-2xl w-full max-w-[350px] p-2 animate-fadeIn">
         {/* Icon */}
         <div className="flex justify-center mb-4">
           {isError ? (

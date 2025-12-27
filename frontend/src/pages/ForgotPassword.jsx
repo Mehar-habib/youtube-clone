@@ -1,15 +1,77 @@
 import { useState } from "react";
 import logo from "../assets/youtube.png";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { showCustomAlert } from "../components/CustomAlert";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(3);
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  const handleSendOtp = async () => {
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        serverUrl + "/api/auth/send-otp",
+        { email },
+        { withCredentials: true }
+      );
+      setStep(2);
+      setLoading(false);
+      showCustomAlert(result.data.message, "success");
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+      showCustomAlert(error.response.data.message, "error");
+    }
+  };
+
+  const verifyOtp = async () => {
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        serverUrl + "/api/auth/verify-otp",
+        { email, otp },
+        { withCredentials: true }
+      );
+      setStep(3);
+      setLoading(false);
+      showCustomAlert(result.data.message, "success");
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+      showCustomAlert(error.response.data.message, "error");
+    }
+  };
+
+  const handleResetPassword = async () => {
+    setLoading(true);
+    try {
+      if (newPassword !== confirmPassword) {
+        showCustomAlert("Passwords do not match", "error");
+        setLoading(false);
+        return;
+      }
+      const result = await axios.post(
+        serverUrl + "/api/auth/reset-password",
+        { email, password: newPassword },
+        { withCredentials: true }
+      );
+      navigate("/signin");
+      setLoading(false);
+      showCustomAlert(result.data.message, "success");
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+      showCustomAlert(error.response.data.message, "error");
+    }
+  };
   return (
     <div className="flex flex-col min-h-screen bg-[#202124] text-white">
       {/* Header */}
@@ -30,7 +92,10 @@ export default function ForgotPassword() {
               <p className="text-gray-400 mb-6 text-center">
                 Enter your email address to receive a verification code.
               </p>
-              <form className="flex flex-col gap-4">
+              <form
+                className="flex flex-col gap-4"
+                onSubmit={(e) => e.preventDefault()}
+              >
                 <input
                   type="email"
                   placeholder="Email Address"
@@ -42,8 +107,10 @@ export default function ForgotPassword() {
                 <button
                   type="button"
                   className="w-full bg-red-600 hover:bg-red-700 transition py-2 rounded font-medium"
+                  onClick={handleSendOtp}
+                  disabled={loading}
                 >
-                  Send OTP
+                  {loading ? "Sending..." : "Send OTP"}
                 </button>
               </form>
               <p
@@ -76,8 +143,10 @@ export default function ForgotPassword() {
                 <button
                   type="button"
                   className="w-full bg-red-600 hover:bg-red-700 transition py-2 rounded font-medium"
+                  onClick={verifyOtp}
+                  disabled={loading}
                 >
-                  Verify OTP
+                  {loading ? "Verifying..." : "Verify OTP"}
                 </button>
               </form>
               <p
@@ -118,8 +187,10 @@ export default function ForgotPassword() {
                 <button
                   type="button"
                   className="w-full bg-red-600 hover:bg-red-700 transition py-2 rounded font-medium"
+                  onClick={handleResetPassword}
+                  disabled={loading}
                 >
-                  Reset Password
+                  {loading ? "Resetting..." : "Reset Password"}
                 </button>
               </form>
               <p

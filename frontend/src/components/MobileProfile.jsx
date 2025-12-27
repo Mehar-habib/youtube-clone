@@ -1,13 +1,65 @@
+import axios from "axios";
 import { FaHistory, FaList, FaThumbsUp } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { GoVideo } from "react-icons/go";
 import { MdLogout, MdOutlineSwitchAccount } from "react-icons/md";
 import { SiYoutubestudio } from "react-icons/si";
 import { TiUserAddOutline } from "react-icons/ti";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { serverUrl } from "../App";
+import { setUserData } from "../redux/userSlice";
+import { showCustomAlert } from "./CustomAlert";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../utils/firebase";
 
 export default function MobileProfile() {
   const { userData } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleGoogleAuth = async () => {
+    try {
+      const response = await signInWithPopup(auth, provider);
+      let user = await response.user;
+      let userName = user.displayName.split(" ")[0];
+      let email = user.email;
+      let photoUrl = user.photoURL;
+
+      const formData = new FormData();
+      formData.append("userName", userName);
+      formData.append("email", email);
+      formData.append("photoUrl", photoUrl);
+
+      const result = await axios.post(
+        serverUrl + "/api/auth/google-auth",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(setUserData(result.data));
+      navigate("/");
+      showCustomAlert("Sign In Successfully", "success");
+    } catch (error) {
+      console.error(error);
+      showCustomAlert(error.response.data.message, "error");
+    }
+  };
+
+  const handleSignout = async () => {
+    try {
+      const result = await axios.get(serverUrl + "/api/auth/signout", {
+        withCredentials: true,
+      });
+      dispatch(setUserData(null));
+      console.log(result.data);
+      showCustomAlert("Sign Out Successfully", "success");
+    } catch (error) {
+      console.error(error);
+      showCustomAlert(error.response.data.message, "error");
+    }
+  };
 
   return (
     <div className="md:hidden bg-[#0f0f0f] text-white min-h-screen w-full ">
@@ -32,13 +84,27 @@ export default function MobileProfile() {
 
       {/* Auth Buttons */}
       <div className="space-y-2 mb-6">
-        <AuthButton icon={<FcGoogle />} text="Sign in with Google" />
-        <AuthButton icon={<TiUserAddOutline />} text="Create new account" />
+        <AuthButton
+          icon={<FcGoogle />}
+          text="Sign in with Google"
+          onClick={handleGoogleAuth}
+        />
+        <AuthButton
+          icon={<TiUserAddOutline />}
+          text="Create new account"
+          onClick={() => navigate("/signup")}
+        />
         <AuthButton
           icon={<MdOutlineSwitchAccount />}
           text="Sign in with another account"
+          onClick={() => navigate("/signin")}
         />
-        <AuthButton icon={<MdLogout />} text="Sign out" danger />
+        <AuthButton
+          icon={<MdLogout />}
+          text="Sign out"
+          onClick={handleSignout}
+          danger
+        />
       </div>
 
       <hr className="border-gray-800 my-4" />

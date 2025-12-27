@@ -8,11 +8,42 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import { showCustomAlert } from "./CustomAlert";
 import { setUserData } from "../redux/userSlice";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../utils/firebase";
 
 export default function Profile() {
   const { userData } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const handleGoogleAuth = async () => {
+    try {
+      const response = await signInWithPopup(auth, provider);
+      let user = await response.user;
+      let userName = user.displayName.split(" ")[0];
+      let email = user.email;
+      let photoUrl = user.photoURL;
+
+      const formData = new FormData();
+      formData.append("userName", userName);
+      formData.append("email", email);
+      formData.append("photoUrl", photoUrl);
+
+      const result = await axios.post(
+        serverUrl + "/api/auth/google-auth",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(setUserData(result.data));
+      navigate("/");
+      showCustomAlert("Sign In Successfully", "success");
+    } catch (error) {
+      console.error(error);
+      showCustomAlert(error.response.data.message, "error");
+    }
+  };
 
   const handleSignout = async () => {
     try {
@@ -52,7 +83,10 @@ export default function Profile() {
 
       {/* Actions */}
       <div className="flex flex-col">
-        <button className="flex items-center gap-2 px-4 py-2 hover:bg-[#2a2a2a] transition text-white">
+        <button
+          className="flex items-center gap-2 px-4 py-2 hover:bg-[#2a2a2a] transition text-white"
+          onClick={handleGoogleAuth}
+        >
           <FcGoogle /> Sign in with Google
         </button>
 

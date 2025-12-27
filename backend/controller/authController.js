@@ -76,3 +76,40 @@ export const signOut = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const googleAuth = async (req, res) => {
+  try {
+    const { userName, email, photoUrl } = req.body;
+    let googlePhoto = photoUrl;
+    if (photoUrl) {
+      try {
+        googlePhoto = await uploadOnCloudinary(photoUrl);
+      } catch (error) {
+        console.log("Cloudinary upload failed!");
+      }
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      await User.create({
+        userName,
+        email,
+        photoUrl: googlePhoto,
+      });
+    } else {
+      if (!user.photoUrl && googlePhoto) {
+        user.photoUrl = googlePhoto;
+        await user.save();
+      }
+    }
+    let token = await genToken(user?._id);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      samesite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return res.status(201).json(user);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

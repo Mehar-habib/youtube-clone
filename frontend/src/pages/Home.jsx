@@ -223,7 +223,10 @@ export default function Home() {
           icon={<FaHome />}
           text="Home"
           active={active === "Home"}
-          onClick={() => setActive("Home")}
+          onClick={() => {
+            setActive("Home");
+            navigate("/");
+          }}
         />
         <MobileSizeNav
           icon={<SiYoutubeshorts />}
@@ -255,7 +258,10 @@ export default function Home() {
           }
           text="You"
           active={active === "You"}
-          onClick={() => setActive("You")}
+          onClick={() => {
+            setActive("You");
+            navigate("/mobile-profile");
+          }}
         />
       </nav>
     </div>

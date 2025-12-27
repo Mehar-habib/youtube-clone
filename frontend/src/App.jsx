@@ -4,10 +4,12 @@ import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import CustomAlert from "./components/CustomAlert";
 import Shorts from "./pages/Shorts/Shorts";
+import getCurrentUser from "./customHooks/getCurrentUser";
 
 export const serverUrl = "http://localhost:8000";
 
 export default function App() {
+  getCurrentUser();
   return (
     <>
       <CustomAlert />

@@ -53,10 +53,49 @@ export const createChannel = async (req, res) => {
   }
 };
 
+export const updateChannel = async (req, res) => {
+  try {
+    const { name, description, category } = req.body;
+    const userId = req.userId;
+    const channel = await Channel.findOne({ owner: userId });
+    if (!channel) {
+      return res.status(404).json({ message: "Channel not found" });
+    }
+    if (name && name !== channel.name) {
+      const nameExist = await Channel.findOne({ name });
+      if (nameExist) {
+        return res.status(400).json({ message: "Channel name already exist" });
+      }
+      channel.name = name;
+    }
+    if (description !== undefined) {
+      channel.description = description;
+    }
+    if (category !== undefined) {
+      channel.category = category;
+    }
+    if (req.files?.avatar) {
+      const avatar = await uploadOnCloudinary(req.files.avatar[0].path);
+      channel.avatar = avatar;
+    }
+    if (req.files?.banner) {
+      const banner = await uploadOnCloudinary(req.files.banner[0].path);
+      channel.banner = banner;
+    }
+    const updatedChannel = await channel.save();
+    await User.findByIdAndUpdate(userId, {
+      userName: name || undefined,
+      photoUrl: channel.avatar || undefined,
+    });
+    return res.status(200).json(updatedChannel);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 export const getChannelData = async (req, res) => {
   try {
     const userId = req.userId;
-    const channel = await Channel.findById({ owner: userId }).populate("owner");
+    const channel = await Channel.findOne({ owner: userId }).populate("owner");
 
     if (!channel) {
       return res.status(400).json({ message: "Channel not found" });

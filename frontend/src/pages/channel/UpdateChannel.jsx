@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import logo from "../../assets/youtube.png";
 import { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
@@ -6,18 +6,19 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../../App";
 import { showCustomAlert } from "../../components/CustomAlert";
-
-export default function CreateChannel() {
-  const { userData } = useSelector((state) => state.user);
+import { setChannelData } from "../../redux/userSlice";
+export default function UpdateChannel() {
+  const { channelData } = useSelector((state) => state.user);
 
   const [step, setStep] = useState(1);
   const [avatar, setAvatar] = useState(null);
   const [banner, setBanner] = useState(null);
-  const [channelName, setChannelName] = useState("");
-  const [category, setCategory] = useState("");
-  const [description, setDescription] = useState("");
+  const [channelName, setChannelName] = useState(channelData?.name);
+  const [category, setCategory] = useState(channelData?.category);
+  const [description, setDescription] = useState(channelData?.description);
   const [loading, setLoading] = useState(false);
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleAvatar = (e) => setAvatar(e.target.files[0]);
@@ -26,7 +27,7 @@ export default function CreateChannel() {
   const nextStep = () => setStep((p) => p + 1);
   const prevStep = () => setStep((p) => p - 1);
 
-  const handleCreateChannel = async () => {
+  const handleUpdateChannel = async () => {
     const formData = new FormData();
     formData.append("avatar", avatar);
     formData.append("banner", banner);
@@ -36,9 +37,14 @@ export default function CreateChannel() {
 
     setLoading(true);
     try {
-      await axios.post(serverUrl + "/api/user/create-channel", formData, {
-        withCredentials: true,
-      });
+      const result = await axios.post(
+        serverUrl + "/api/user/update-channel",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(setChannelData(result.data));
       showCustomAlert("Channel created successfully", "success");
       navigate("/");
     } catch (error) {
@@ -47,21 +53,8 @@ export default function CreateChannel() {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-gray-800">
-        <div className="flex items-center gap-2">
-          <img src={logo} className="w-8" />
-          <span className="font-semibold text-lg">YouTube</span>
-        </div>
-        <img
-          src={userData?.photoUrl}
-          className="w-9 h-9 rounded-full object-cover"
-        />
-      </header>
-
       {/* Main */}
       <main className="flex justify-center items-center mt-10">
         <div className="w-full max-w-md bg-[#181818] rounded-xl shadow-lg p-6">
@@ -80,7 +73,7 @@ export default function CreateChannel() {
           {/* STEP 1 */}
           {step === 1 && (
             <div className="space-y-5 text-center">
-              <h2 className="text-xl font-semibold">How you’ll appear</h2>
+              <h2 className="text-xl font-semibold">Customize Channel</h2>
               <p className="text-sm text-gray-400">
                 Choose profile picture & channel name
               </p>
@@ -130,7 +123,7 @@ export default function CreateChannel() {
           {/* STEP 2 */}
           {step === 2 && (
             <div className="space-y-6 text-center">
-              <h2 className="text-xl font-semibold">Your Channel</h2>
+              <h2 className="text-xl font-semibold">Your Updated Channel</h2>
 
               <div className="flex flex-col items-center gap-3">
                 {avatar ? (
@@ -148,7 +141,7 @@ export default function CreateChannel() {
                 onClick={nextStep}
                 className="w-full bg-red-600 py-2 rounded-lg"
               >
-                Continue
+                Customize Channel
               </button>
 
               <span
@@ -164,7 +157,7 @@ export default function CreateChannel() {
           {step === 3 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-center">
-                Create Channel
+                Customize Channel
               </h2>
 
               <label className="block cursor-pointer">
@@ -202,11 +195,11 @@ export default function CreateChannel() {
               />
 
               <button
-                onClick={handleCreateChannel}
                 disabled={!description || !category || loading}
                 className="w-full bg-red-600 py-2 rounded-lg disabled:opacity-50"
+                onClick={handleUpdateChannel}
               >
-                {loading ? "Creating..." : "Create Channel"}
+                {loading ? "updating..." : "Update Channel"}
               </button>
 
               <span

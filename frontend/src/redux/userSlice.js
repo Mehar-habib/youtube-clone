@@ -4,13 +4,17 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     userData: null,
+    channelData: null,
   },
   reducers: {
     setUserData: (state, action) => {
       state.userData = action.payload;
     },
+    setChannelData: (state, action) => {
+      state.channelData = action.payload;
+    },
   },
 });
 
-export const { setUserData } = userSlice.actions; //ek action creator hai. Ye ek function return karta hai jo payload ke saath state update karega.
+export const { setUserData, setChannelData } = userSlice.actions; //ek action creator hai. Ye ek function return karta hai jo payload ke saath state update karega.
 export default userSlice.reducer; //ko store me add karte hain taki ye global state manage kare.

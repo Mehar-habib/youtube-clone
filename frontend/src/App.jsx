@@ -9,11 +9,14 @@ import MobileProfile from "./components/MobileProfile";
 import ForgotPassword from "./pages/ForgotPassword";
 import CreateChannel from "./pages/channel/CreateChannel";
 import ViewChannel from "./pages/channel/ViewChannel";
+import getChannelData from "./customHooks/getChannelData";
+import UpdateChannel from "./pages/channel/UpdateChannel";
 
 export const serverUrl = "http://localhost:8000";
 
 export default function App() {
   getCurrentUser();
+  getChannelData();
   return (
     <>
       <CustomAlert />
@@ -22,6 +25,7 @@ export default function App() {
           <Route path="/shorts" element={<Shorts />} />
           <Route path="/mobile-profile" element={<MobileProfile />} />
           <Route path="/view-channel" element={<ViewChannel />} />
+          <Route path="/update-channel" element={<UpdateChannel />} />
         </Route>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />

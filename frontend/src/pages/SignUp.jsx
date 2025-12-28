@@ -59,11 +59,14 @@ export default function SignUp() {
       );
       console.log(result);
       dispatch(setUserData(result.data));
-      navigate("/");
-      setLoading(false);
       showCustomAlert("Sign Up Successfully", "success");
+      setLoading(false);
+      setTimeout(() => {
+        navigate("/");
+      }, 300);
     } catch (error) {
       console.error(error);
+      showCustomAlert(error.response.data.message, "error");
       setLoading(false);
     }
   };

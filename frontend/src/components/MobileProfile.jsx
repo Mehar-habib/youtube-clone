@@ -75,7 +75,14 @@ export default function MobileProfile() {
           <div className="flex flex-col">
             <span className="text-sm font-semibold">{userData.userName}</span>
             <span className="text-xs text-gray-400">{userData.email}</span>
-            <span className="text-xs text-blue-400 mt-1 cursor-pointer">
+            <span
+              className="text-xs text-blue-400 mt-1 cursor-pointer"
+              onClick={() => {
+                userData?.channel
+                  ? navigate("/view-channel")
+                  : navigate("/create-channel");
+              }}
+            >
               {userData.channel ? "View channel" : "Create channel"}
             </span>
           </div>

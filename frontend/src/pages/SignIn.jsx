@@ -43,9 +43,11 @@ export default function SignIn() {
       );
       console.log(result);
       dispatch(setUserData(result.data));
-      navigate("/");
-      setLoading(false);
       showCustomAlert("Sign In Successfully", "success");
+      setTimeout(() => {
+        navigate("/");
+      }, 300);
+      setLoading(false);
     } catch (error) {
       console.error(error);
       setLoading(false);

@@ -75,7 +75,14 @@ export default function Profile() {
               <p className="text-sm text-gray-400">{userData.email}</p>
             </div>
           </div>
-          <p className="text-sm text-red-500 hover:underline cursor-pointer">
+          <p
+            className="text-sm text-red-500 hover:underline cursor-pointer"
+            onClick={() => {
+              userData?.channel
+                ? navigate("/view-channel")
+                : navigate("/create-channel");
+            }}
+          >
             {userData?.channel ? "View Channel" : "Create Channel"}
           </p>
         </div>

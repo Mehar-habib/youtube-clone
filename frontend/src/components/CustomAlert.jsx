@@ -28,7 +28,7 @@ export default function CustomAlert() {
     if (visible) {
       const timer = setTimeout(() => {
         setVisible(false);
-      }, 10000);
+      }, 5000);
 
       return () => clearTimeout(timer);
     }
@@ -39,8 +39,7 @@ export default function CustomAlert() {
   const isError = type === "error";
 
   return (
-    // ✅ TOP CENTER + 50px FROM TOP
-    <div className="fixed top-[20px] left-1/2 -translate-x-1/2 z-50 w-screen px-4 flex justify-center">
+    <div className="fixed top-[60px] left-1/2 -translate-x-1/2 z-50 w-screen px-4 flex justify-center">
       <div className="bg-[#202124] border border-[#2a2a2a] rounded-xl shadow-2xl w-full max-w-[350px] p-2 animate-fadeIn">
         {/* Icon */}
         <div className="flex justify-center mb-4">

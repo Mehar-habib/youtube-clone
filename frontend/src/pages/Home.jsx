@@ -86,7 +86,10 @@ export default function Home() {
           {/* Right */}
           <div className="flex items-center gap-3">
             {userData?.channel && (
-              <button className="hidden md:flex items-center gap-1 bg-[#272727] px-3 py-1 rounded-full hover:bg-[#3a3a3a] transition">
+              <button
+                className="hidden md:flex items-center gap-1 bg-[#272727] px-3 py-1 rounded-full hover:bg-[#3a3a3a] transition"
+                onClick={() => navigate("/create")}
+              >
                 <span className="text-lg">+</span>
                 <span>Create</span>
               </button>
@@ -237,7 +240,10 @@ export default function Home() {
         <MobileSizeNav
           icon={<IoIosAddCircle size={40} />}
           active={active === "+"}
-          onClick={() => setActive("+")}
+          onClick={() => {
+            setActive("+");
+            navigate("/create");
+          }}
         />
         <MobileSizeNav
           icon={<MdOutlineSubscriptions />}

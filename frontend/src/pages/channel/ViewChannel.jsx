@@ -79,7 +79,10 @@ export default function ViewChannel() {
             will appear here.
           </p>
         </div>
-        <button className="bg-red-600 hover:bg-red-700 px-5 py-2 rounded font-medium transition">
+        <button
+          className="bg-red-600 hover:bg-red-700 px-5 py-2 rounded font-medium transition"
+          onClick={() => navigate("/create")}
+        >
           + Create
         </button>
       </div>

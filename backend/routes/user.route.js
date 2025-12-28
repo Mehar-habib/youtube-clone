@@ -1,8 +1,18 @@
 import { Router } from "express";
 import isAuth from "../middleware/isAuth.js";
-import { getCurrentUser } from "../controller/userController.js";
+import { createChannel, getCurrentUser } from "../controller/userController.js";
+import upload from "../middleware/multer.js";
 
 const router = Router();
 router.get("/get-user", isAuth, getCurrentUser);
+router.post(
+  "/create-channel",
+  isAuth,
+  upload.fields([
+    { name: "avatar", maxCount: 1 },
+    { name: "banner", maxCount: 1 },
+  ]),
+  createChannel
+);
 
 export default router;

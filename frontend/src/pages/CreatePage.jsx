@@ -1,48 +1,11 @@
-// import { useState } from "react";
-// import { FaList, FaPen, FaPlay, FaVideo } from "react-icons/fa";
-// import logo from "../../assets/youtube.png";
-
-// export default function CreatePage() {
-//   const [selected, setSelected] = useState(false);
-//   const option = [
-//     {id: "video", icon: <FaVideo />, title: "Upload video"},
-//     {id: "short", icon: <FaPlay />, title: "Create short"},
-//     {id: "post", icon: <FaPen />, title: "Create community post"},
-//     {id: "playlist", icon: <FaList />, title: "New Playlist"},
-//   ];
-
-//   return <div className="bg-[#0f0f0f] min-h-screen text-white px-6 py-8 mt-10 flex flex-col">
-//     <header>
-//       <h1>Create</h1>
-//       <p>Choose what type of content you want to create for your audience</p>
-//     </header>
-//     <div>
-//       {option.map((opt) => (
-//         <div className={`bg-[#1f1f1f] border border-[#3f3f3f] rounded-lg p-6 flex flex-col items-center text-center justify-center cursor-pointer transition ${selected === opt.id ? "ring-2 ring-red-500" : "hover:bg-[#272727]"}`} onClick={()=> setSelected(opt.id)}>
-//           <div>{opt.title}</div>
-//         </div>
-//       ))}
-//     </div>
-//       <div>
-//       <img src={logo} alt="" />
-//       {!selected ? <div>
-//         <p>create content on any device</p>
-//         <p>Upload and record at home or on the go. Everything you make public will appear here.</p>
-//       </div> : <div>
-//          <p>Ready to create?</p>
-//         <p>Click below to start your {option.find((opt) => opt.id === selected)?.title}</p>
-//         <button>+ Create</button>
-//         </div>}
-//       </div>
-//   </div>;
-// }
-
 import { useState } from "react";
 import { FaList, FaPen, FaPlay, FaVideo } from "react-icons/fa";
-import logo from "../../assets/youtube.png";
+import logo from "../assets/youtube.png";
+import { useNavigate } from "react-router-dom";
 
 export default function CreatePage() {
   const [selected, setSelected] = useState(null);
+  const navigate = useNavigate();
 
   const options = [
     { id: "video", icon: <FaVideo />, title: "Upload video" },
@@ -50,8 +13,18 @@ export default function CreatePage() {
     { id: "post", icon: <FaPen />, title: "Community Post" },
     { id: "playlist", icon: <FaList />, title: "New Playlist" },
   ];
-
   const selectedOption = options.find((opt) => opt.id === selected);
+  const handleRoute = () => {
+    const routes = {
+      video: "/create-video",
+      short: "/create-short",
+      post: "/create-post",
+      playlist: "/create-playlist",
+    };
+    if (selected && routes[selected]) {
+      navigate(routes[selected]);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white px-6 py-10 flex flex-col items-center">
@@ -112,7 +85,10 @@ export default function CreatePage() {
                 {selectedOption?.title}
               </span>
             </p>
-            <button className="mt-2 bg-red-600 hover:bg-red-700 transition px-6 py-2 rounded-lg font-medium">
+            <button
+              className="mt-2 bg-red-600 hover:bg-red-700 transition px-6 py-2 rounded-lg font-medium"
+              onClick={handleRoute}
+            >
               + Create
             </button>
           </>

@@ -12,7 +12,11 @@ import ViewChannel from "./pages/channel/ViewChannel";
 import getChannelData from "./customHooks/getChannelData";
 import UpdateChannel from "./pages/channel/UpdateChannel";
 import { useSelector } from "react-redux";
-import CreatePage from "./pages/Shorts/CreatePage";
+import CreatePage from "./pages/CreatePage";
+import CreateVideo from "./pages/Videos/CreateVideo";
+import CreateShorts from "./pages/Shorts/CreateShorts";
+import CreatePlaylist from "./pages/Playlist/CreatePlaylist";
+import CreatePost from "./pages/Post/CreatePost";
 
 export const serverUrl = "http://localhost:8000";
 
@@ -65,12 +69,44 @@ export default function App() {
               </ProtectRoute>
             }
           />
-
           <Route
             path="/create"
             element={
               <ProtectRoute userData={userData}>
                 <CreatePage />
+              </ProtectRoute>
+            }
+          />
+
+          <Route
+            path="/create-video"
+            element={
+              <ProtectRoute userData={userData}>
+                <CreateVideo />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/create-short"
+            element={
+              <ProtectRoute userData={userData}>
+                <CreateShorts />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/create-playlist"
+            element={
+              <ProtectRoute userData={userData}>
+                <CreatePlaylist />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/create-post"
+            element={
+              <ProtectRoute userData={userData}>
+                <CreatePost />
               </ProtectRoute>
             }
           />

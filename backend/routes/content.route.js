@@ -2,6 +2,7 @@ import { Router } from "express";
 import isAuth from "../middleware/isAuth.js";
 import upload from "../middleware/multer.js";
 import { createVideo } from "../controller/videoController.js";
+import { createShort } from "../controller/shortController.js";
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.post(
   ]),
   createVideo
 );
+router.post("/create-short", isAuth, upload.single("shortUrl"), createShort);
 
 export default router;

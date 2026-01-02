@@ -35,3 +35,17 @@ export const createShort = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const getAllShorts = async (req, res) => {
+  try {
+    const shorts = await Short.find()
+      .sort({ createdAt: -1 })
+      .populate("channel");
+    if (!shorts) {
+      return res.status(400).json({ message: "Shorts not found" });
+    }
+    return res.status(200).json(shorts);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

@@ -1,13 +1,16 @@
 import axios from "axios";
 import { useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { serverUrl } from "../../App";
 import { showCustomAlert } from "../../components/CustomAlert";
 import { useNavigate } from "react-router-dom";
+import { setAllShortData } from "../../redux/contentSlice";
+import { setChannelData } from "../../redux/userSlice";
 
 export default function CreateShorts() {
   const { channelData } = useSelector((state) => state.user);
+  const { allShortsData } = useSelector((state) => state.content);
 
   const [shortUrl, setShortUrl] = useState(null);
   const [title, setTitle] = useState("");
@@ -16,6 +19,7 @@ export default function CreateShorts() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleUploadShort = async () => {
     setLoading(true);
@@ -31,11 +35,22 @@ export default function CreateShorts() {
     formData.append("channelId", channelData._id);
 
     try {
-      await axios.post(serverUrl + "/api/content/create-short", formData, {
-        withCredentials: true,
-      });
+      const result = await axios.post(
+        serverUrl + "/api/content/create-short",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(setAllShortData([...allShortsData, result.data]));
+      const updateChannel = {
+        ...channelData,
+        shorts: [...(channelData.shorts || []), result.data],
+      };
+      dispatch(setChannelData(updateChannel));
       showCustomAlert("Short uploaded successfully", "success");
       navigate("/");
+      setLoading(false);
     } catch (error) {
       showCustomAlert(error.response?.data?.message || "Error", "error");
     } finally {

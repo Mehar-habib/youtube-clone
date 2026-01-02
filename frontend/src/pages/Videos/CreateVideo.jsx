@@ -3,10 +3,13 @@ import { useState } from "react";
 import { serverUrl } from "../../App";
 import { showCustomAlert } from "../../components/CustomAlert";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FaUpload } from "react-icons/fa";
+import { setAllVideosData } from "../../redux/contentSlice";
+import { setChannelData } from "../../redux/userSlice";
 
 export default function CreateVideo() {
+  const { allVideosData } = useSelector((state) => state.content);
   const { channelData } = useSelector((state) => state.user);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -16,6 +19,7 @@ export default function CreateVideo() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleVideo = (e) => setVideoUrl(e.target.files[0]);
   const handleThumbnail = (e) => setThumbnail(e.target.files[0]);
@@ -44,6 +48,12 @@ export default function CreateVideo() {
       console.log(result);
       showCustomAlert("Video uploaded successfully", "success");
       navigate("/");
+      dispatch(setAllVideosData([...allVideosData, result.data]));
+      const updateChannel = {
+        ...channelData,
+        videos: [...(channelData.videos || []), result.data],
+      };
+      dispatch(setChannelData(updateChannel));
     } catch (error) {
       console.error(error);
       showCustomAlert(error.response?.data?.message || "Error", "error");

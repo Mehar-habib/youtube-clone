@@ -22,6 +22,8 @@ import { IoIosAddCircle } from "react-icons/io";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Profile from "../components/Profile";
+import AllVideosPage from "../components/AllVideosPage";
+import AllShortsPage from "../components/AllShortsPage";
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -201,16 +203,23 @@ export default function Home() {
       >
         {/* Categories */}
         {location.pathname === "/" && (
-          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar mb-4">
-            {categories.map((category, idx) => (
-              <button
-                key={idx}
-                className="px-3 py-1 rounded-full bg-[#272727] hover:bg-[#3a3a3a] whitespace-nowrap transition"
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="flex items-center gap-3 overflow-x-auto no-scrollbar mb-4">
+              {categories.map((category, idx) => (
+                <button
+                  key={idx}
+                  className="px-3 py-1 rounded-full bg-[#272727] hover:bg-[#3a3a3a] whitespace-nowrap transition"
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-3">
+              <AllVideosPage />
+              <AllShortsPage />
+            </div>
+          </>
         )}
 
         {/* Outlet for nested routes */}

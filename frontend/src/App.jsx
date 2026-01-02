@@ -17,6 +17,7 @@ import CreateVideo from "./pages/Videos/CreateVideo";
 import CreateShorts from "./pages/Shorts/CreateShorts";
 import CreatePlaylist from "./pages/Playlist/CreatePlaylist";
 import CreatePost from "./pages/Post/CreatePost";
+import getAllContentData from "./customHooks/getAllcontentData";
 
 export const serverUrl = "http://localhost:8000";
 
@@ -30,7 +31,7 @@ const ProtectRoute = ({ userData, children }) => {
 export default function App() {
   getCurrentUser();
   getChannelData();
-
+  getAllContentData();
   const { userData } = useSelector((state) => state.user);
   return (
     <>

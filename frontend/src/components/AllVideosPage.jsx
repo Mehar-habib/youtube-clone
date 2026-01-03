@@ -51,7 +51,7 @@ export default function AllVideosPage() {
             channelLogo={video.channel?.avatar}
             channelName={video.channel?.name}
             duration={duration[video._id] || "0:00"}
-            views={video.views}
+            id={video?._id}
           />
         ))}
       </div>

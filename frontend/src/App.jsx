@@ -18,6 +18,7 @@ import CreateShorts from "./pages/Shorts/CreateShorts";
 import CreatePlaylist from "./pages/Playlist/CreatePlaylist";
 import CreatePost from "./pages/Post/CreatePost";
 import getAllContentData from "./customHooks/getAllcontentData";
+import PlayVideo from "./pages/Videos/PlayVideo";
 
 export const serverUrl = "http://localhost:8000";
 
@@ -120,6 +121,15 @@ export default function App() {
           element={
             <ProtectRoute userData={userData}>
               <CreateChannel />
+            </ProtectRoute>
+          }
+        />
+
+        <Route
+          path="/play-video/:videoId"
+          element={
+            <ProtectRoute userData={userData}>
+              <PlayVideo />
             </ProtectRoute>
           }
         />

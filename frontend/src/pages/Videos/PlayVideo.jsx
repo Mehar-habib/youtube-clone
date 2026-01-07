@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   FaBackward,
@@ -17,6 +17,9 @@ import {
 import { SiYoutubestudio } from "react-icons/si";
 import ShortCard from "../../components/ShortCard";
 import Description from "../../components/Description";
+import axios from "axios";
+import { serverUrl } from "../../App";
+import { setChannelData } from "../../redux/userSlice";
 
 const IconButton = ({ icon: Icon, active, label, count, onClick }) => {
   <button onClick={onClick}>
@@ -33,6 +36,7 @@ const IconButton = ({ icon: Icon, active, label, count, onClick }) => {
   </button>;
 };
 export default function PlayVideo() {
+  const { userData } = useSelector((state) => state.user);
   const [video, setVideo] = useState(null);
   const [channel, setChannel] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -42,14 +46,22 @@ export default function PlayVideo() {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [vol, setVol] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(
+    channel?.subscribers?.some(
+      (sub) =>
+        sub._id?.toString() === userData._id?.toString() ||
+        sub?.toString() === userData._id?.toString()
+    )
+  );
 
   const { videoId } = useParams();
   const videoRef = useRef(null);
   const navigate = useNavigate();
-  const { userData } = useSelector((state) => state.user);
   const { allVideosData, allShortsData } = useSelector(
     (state) => state.content
   );
+  const dispatch = useDispatch();
 
   const suggestedVideos =
     allVideosData?.filter((video) => video._id !== videoId).slice(0, 10) || [];
@@ -122,6 +134,35 @@ export default function PlayVideo() {
       videoRef.current.requestFullscreen();
     }
   };
+  const handleSubscribe = async () => {
+    if (!channel._id) return;
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        serverUrl + "/api/user/toggle-subscribe",
+        { channelId: channel._id },
+        { withCredentials: true }
+      );
+      setChannel((prev) => ({
+        ...prev,
+        subscribers: result.data.subscribers || prev.subscribers,
+      }));
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    setIsSubscribed(
+      channel?.subscribers?.some(
+        (sub) =>
+          sub._id?.toString() === userData._id?.toString() ||
+          sub?.toString() === userData._id?.toString()
+      )
+    );
+  }, [channel?.subscribers, userData?._id]);
   return (
     <div className="flex bg-[#0f0f0f] text-white flex-col lg:flex-row gap-6 p-4 lg:p-6">
       <div className="flex-1">
@@ -237,8 +278,19 @@ export default function PlayVideo() {
               <h1 className="font-bold">{channel?.name}</h1>
               <h3 className="text-[13px]">{channel?.subscribers?.length}</h3>
             </div>
-            <button className="px-[20px] py-2 rounded-4xl border border-gray-600 ml-5 bg-white text-black hover:bg-red-500 hover:text-black">
-              Subscribe
+            <button
+              onClick={handleSubscribe}
+              className={`px-[20px] py-2 rounded-4xl border border-gray-600 ml-5 ${
+                isSubscribed
+                  ? "bg-black text-white hover:bg-red-500 hover:text-black"
+                  : "bg-white text-black hover:bg-red-500 hover:text-black"
+              }`}
+            >
+              {loading
+                ? "Loading..."
+                : isSubscribed
+                ? "Subscribed"
+                : "Subscribe"}
             </button>
           </div>
           <div className="flex items-center gap-6 mt-3">

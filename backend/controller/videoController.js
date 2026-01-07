@@ -64,3 +64,87 @@ export const getAllVideos = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const toggleLikes = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const userId = req.userId;
+
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(400).json({ message: "Video not found" });
+    }
+    if (video.likes.includes(userId)) {
+      video.likes.pull(userId);
+    } else {
+      video.likes.push(userId);
+      video.disLikes.pull(userId);
+    }
+    await video.save();
+    return res.status(200).json(video);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const toggleDisLikes = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const userId = req.userId;
+
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(400).json({ message: "Video not found" });
+    }
+    if (video.disLikes.includes(userId)) {
+      video.disLikes.pull(userId);
+    } else {
+      video.disLikes.push(userId);
+      video.likes.pull(userId);
+    }
+    await video.save();
+    return res.status(200).json(video);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const toggleSave = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const userId = req.userId;
+
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(400).json({ message: "Video not found" });
+    }
+    if (video.saveBy.includes(userId)) {
+      video.saveBy.pull(userId);
+    } else {
+      video.saveBy.push(userId);
+    }
+    await video.save();
+    return res.status(200).json(video);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getViews = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const video = await Video.findByIdAndUpdate(
+      videoId,
+      {
+        $inc: { views: 1 },
+      },
+      { new: true }
+    );
+    if (!video) {
+      return res.status(400).json({ message: "Video not found" });
+    }
+    return res.status(200).json(video);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

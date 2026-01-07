@@ -73,7 +73,7 @@ const videoSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    saveBay: [
+    saveBy: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

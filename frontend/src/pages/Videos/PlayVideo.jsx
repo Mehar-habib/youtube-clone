@@ -20,6 +20,7 @@ import Description from "../../components/Description";
 import axios from "axios";
 import { serverUrl } from "../../App";
 import { setChannelData } from "../../redux/userSlice";
+import { setAllVideosData } from "../../redux/contentSlice";
 
 const IconButton = ({ icon: Icon, active, label, count, onClick }) => {
   <button onClick={onClick}>
@@ -76,7 +77,26 @@ export default function PlayVideo() {
       setVideo(currentVideo);
       setChannel(currentVideo.channel);
     }
-  }, [videoId, allVideosData]);
+    const addViews = async () => {
+      try {
+        const result = await axios.put(
+          `${serverUrl}/api/content/video/${videoId}/add-view`,
+          {},
+          { withCredentials: true }
+        );
+        setVideo((prev) =>
+          prev ? { ...prev, views: result.data.views } : prev
+        );
+        const updatedVideo = allVideosData.map((v) =>
+          v._id === videoId ? { ...v, views: result.data.views } : v
+        );
+        dispatch(setAllVideosData(updatedVideo));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    addViews();
+  }, []);
 
   const handleUpdateTime = () => {
     if (!videoRef.current) return;

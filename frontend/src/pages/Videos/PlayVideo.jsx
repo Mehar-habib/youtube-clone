@@ -208,6 +208,24 @@ export default function PlayVideo() {
       console.error(error);
     }
   };
+  const toggleSave = async () => {
+    try {
+      const result = await axios.put(
+        `${serverUrl}/api/content/video/${videoId}/toggle-save`,
+        {},
+        { withCredentials: true }
+      );
+      setVideo(result.data);
+      console.log(result.data);
+      const updatedVideos = allVideosData.map((v) =>
+        v._id === videoId ? result.data : v
+      );
+      dispatch(setAllVideosData(updatedVideos));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     setIsSubscribed(
       channel?.subscribers?.some(
@@ -379,6 +397,7 @@ export default function PlayVideo() {
               icon={FaBookmark}
               label={"Save"}
               active={video?.saveBy?.includes(userData._id)}
+              onClick={toggleSave}
             />
           </div>
         </div>

@@ -23,18 +23,20 @@ import { setChannelData } from "../../redux/userSlice";
 import { setAllVideosData } from "../../redux/contentSlice";
 
 const IconButton = ({ icon: Icon, active, label, count, onClick }) => {
-  <button onClick={onClick}>
-    <div
-      className={`${
-        active ? "bg-white" : "bg-[#00000065] border border-gray-700"
-      } p-3 rounded-full hover:bg-gray-700 transition`}
-    >
-      <Icon className={`${active ? "text-black" : "text-white"}`} />
-    </div>
-    <span className="text-xs mt-1 flex gap-1">
-      {count !== undefined && ` (${count})`} <span>{label}</span>
-    </span>
-  </button>;
+  return (
+    <button onClick={onClick}>
+      <div
+        className={`${
+          active ? "bg-white" : "bg-[#00000065] border border-gray-700"
+        } p-3 rounded-full hover:bg-gray-700 transition`}
+      >
+        <Icon className={`${active ? "text-black" : "text-white"}`} />
+      </div>
+      <span className="text-xs mt-1 flex gap-1">
+        {count !== undefined && ` (${count})`} <span>{label}</span>
+      </span>
+    </button>
+  );
 };
 export default function PlayVideo() {
   const { userData } = useSelector((state) => state.user);
@@ -172,6 +174,38 @@ export default function PlayVideo() {
     } catch (error) {
       console.error(error);
       setLoading(false);
+    }
+  };
+  const toggleLike = async () => {
+    try {
+      const result = await axios.put(
+        `${serverUrl}/api/content/video/${videoId}/toggle-like`,
+        {},
+        { withCredentials: true }
+      );
+      setVideo(result.data);
+      const updatedVideos = allVideosData.map((v) =>
+        v._id === videoId ? result.data : v
+      );
+      dispatch(setAllVideosData(updatedVideos));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const toggleDisLike = async () => {
+    try {
+      const result = await axios.put(
+        `${serverUrl}/api/content/video/${videoId}/toggle-dislike`,
+        {},
+        { withCredentials: true }
+      );
+      setVideo(result.data);
+      const updatedVideos = allVideosData.map((v) =>
+        v._id === videoId ? result.data : v
+      );
+      dispatch(setAllVideosData(updatedVideos));
+    } catch (error) {
+      console.error(error);
     }
   };
   useEffect(() => {
@@ -319,13 +353,15 @@ export default function PlayVideo() {
               label={"Likes"}
               active={video?.likes?.includes(userData._id)}
               count={video?.likes.length}
+              onClick={toggleLike}
             />
 
             <IconButton
               icon={FaThumbsDown}
               label={"Dislikes"}
-              active={video?.Dislikes?.includes(userData._id)}
-              count={video?.Dislikes?.length}
+              active={video?.disLikes?.includes(userData._id)}
+              count={video?.disLikes?.length}
+              onClick={toggleDisLike}
             />
 
             <IconButton

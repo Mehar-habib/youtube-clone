@@ -55,7 +55,7 @@ export const getAllVideos = async (req, res) => {
   try {
     const videos = await Video.find()
       .sort({ createdAt: -1 })
-      .populate("channel");
+      .populate("channel comments.replies.author comments.author");
     if (!videos) {
       return res.status(400).json({ message: "Videos not found" });
     }
@@ -144,6 +144,54 @@ export const getViews = async (req, res) => {
       return res.status(400).json({ message: "Video not found" });
     }
     return res.status(200).json(video);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const addComment = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const { message } = req.body;
+    const userId = req.userId;
+
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(400).json({ message: "Video not found" });
+    }
+    video.comments.push({ author: userId, message });
+    await video.save();
+    const populatedVideo = await Video.findById(videoId).populate({
+      path: "comments.author",
+      select: "userName photoUrl email",
+    });
+    return res.status(200).json(populatedVideo);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const addReply = async (req, res) => {
+  try {
+    const { videoId, commentId } = req.params;
+    const { message } = req.body;
+    const userId = req.userId;
+
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(400).json({ message: "Video not found" });
+    }
+    const comment = await video.comments.id(commentId);
+    if (!comment) {
+      return res.status(400).json({ message: "Comment not found" });
+    }
+    comment.replies.push({ author: userId, message });
+    video.save();
+    const populatedVideo = await Video.findById(videoId).populate({
+      path: "comments.replies.author",
+      select: "userName photoUrl email",
+    });
+    return res.status(200).json(populatedVideo);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

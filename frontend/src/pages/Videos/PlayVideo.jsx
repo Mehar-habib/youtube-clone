@@ -50,6 +50,8 @@ export default function PlayVideo() {
   const [isMuted, setIsMuted] = useState(false);
   const [vol, setVol] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [comment, setComment] = useState([]);
+  const [newComment, setNewComment] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(
     channel?.subscribers?.some(
       (sub) =>
@@ -78,6 +80,7 @@ export default function PlayVideo() {
     if (currentVideo) {
       setVideo(currentVideo);
       setChannel(currentVideo.channel);
+      setComment(currentVideo?.comments);
     }
     const addViews = async () => {
       try {
@@ -98,7 +101,7 @@ export default function PlayVideo() {
       }
     };
     addViews();
-  }, []);
+  }, [videoId]);
 
   const handleUpdateTime = () => {
     if (!videoRef.current) return;
@@ -223,6 +226,41 @@ export default function PlayVideo() {
       dispatch(setAllVideosData(updatedVideos));
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment) return;
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/content/video/${videoId}/add-comment`,
+        { message: newComment },
+        { withCredentials: true }
+      );
+      setComment((prev) => [result.data?.comments.slice(-1)[0], ...prev]);
+      setLoading(false);
+      setNewComment("");
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+  const handleReply = async ({ commentId, replyText }) => {
+    if (!replyText) return;
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/content/video/${videoId}/${commentId}/add-reply`,
+        { message: replyText },
+        { withCredentials: true }
+      );
+      setComment(result.data?.comments);
+      setLoading(false);
+      console.log(result.data.comments);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
     }
   };
 
@@ -416,10 +454,54 @@ export default function PlayVideo() {
               type="text"
               placeholder="Add a comment"
               className="flex-1 border border-gray-700 bg-[#1a1a1a] text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-red-600"
+              onChange={(e) => setNewComment(e.target.value)}
+              value={newComment}
             />
-            <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
-              Post
+            <button
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+              onClick={handleAddComment}
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Post"}
             </button>
+          </div>
+
+          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            {comment?.map((c) => (
+              <div
+                key={c?._id}
+                className="bg-[#1a1a1a] rounded-lg shadow-sm text-sm"
+              >
+                <div className="flex items-center justify-start gap-1">
+                  <img
+                    src={c?.author?.photoUrl}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <h2 className="font-semibold">@{c?.author?.userName}</h2>
+                </div>
+                <p className="px-5 py-5">{c?.message}</p>
+                <div className="ml-4 mt-2 space-y-2">
+                  {c?.replies.map((reply) => (
+                    <div key={reply._id} className="p-2 bg-[#2a2a2a] rounded">
+                      <div className="flex items-center justify-start gap-1">
+                        <img
+                          src={reply?.author?.photoUrl}
+                          className="w-6 h-6 rounded-full object-cover"
+                          alt=""
+                        />
+                        <h2>@{reply?.author?.userName}</h2>
+                        <p className="px-5 py-5">{reply?.message}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <ReplySection
+                  comment={c}
+                  handleReply={handleReply}
+                  loading={loading}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -471,3 +553,39 @@ export default function PlayVideo() {
     </div>
   );
 }
+
+const ReplySection = ({ comment, handleReply, loading }) => {
+  const [replyText, setReplyText] = useState("");
+  const [showReplyInput, setShowReplyInput] = useState(false);
+  return (
+    <div className="mt-3">
+      {showReplyInput && (
+        <div className="flex gap-2 mt-1 ml-4">
+          <input
+            type="text"
+            placeholder="Add a reply"
+            onChange={(e) => setReplyText(e.target.value)}
+            value={replyText}
+            className="flex-1 border border-gray-700 gb-[#1a1a1a] text-white rounded-lg px-2 py-2 focus:outline-none focus:ring-1 focus:ring-red-500 text-sm"
+          />
+          <button
+            onClick={() => {
+              handleReply({ commentId: comment._id, replyText: replyText });
+              setShowReplyInput(false);
+              setReplyText("");
+            }}
+            className="bg-red-500 hover:bg-red-600 text-white px-2 py-2 rounded-lg text-sm"
+          >
+            {loading ? "Loading..." : "Reply"}
+          </button>
+        </div>
+      )}
+      <button
+        onClick={() => setShowReplyInput(!showReplyInput)}
+        className="ml-4 text-xs text-gray-400 mt-1"
+      >
+        Reply
+      </button>
+    </div>
+  );
+};

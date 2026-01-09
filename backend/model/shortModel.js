@@ -21,9 +21,7 @@ const commentSchema = new mongoose.Schema(
     message: {
       type: String,
     },
-    replies: {
-      replySchema,
-    },
+    replies: [replySchema],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date },
   },
@@ -76,9 +74,7 @@ const shortSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    comments: {
-      commentSchema,
-    },
+    comments: [commentSchema],
   },
   { timestamps: true }
 );

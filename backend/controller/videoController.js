@@ -161,10 +161,15 @@ export const addComment = async (req, res) => {
     }
     video.comments.push({ author: userId, message });
     await video.save();
-    const populatedVideo = await Video.findById(videoId).populate({
-      path: "comments.author",
-      select: "userName photoUrl email",
-    });
+    const populatedVideo = await Video.findById(videoId)
+      .populate({
+        path: "comments.author",
+        select: "userName photoUrl email",
+      })
+      .populate({
+        path: "comments.replies.author",
+        select: "userName photoUrl email",
+      });
     return res.status(200).json(populatedVideo);
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -187,10 +192,15 @@ export const addReply = async (req, res) => {
     }
     comment.replies.push({ author: userId, message });
     video.save();
-    const populatedVideo = await Video.findById(videoId).populate({
-      path: "comments.replies.author",
-      select: "userName photoUrl email",
-    });
+    const populatedVideo = await Video.findById(videoId)
+      .populate({
+        path: "comments.author",
+        select: "userName photoUrl email",
+      })
+      .populate({
+        path: "comments.replies.author",
+        select: "userName photoUrl email",
+      });
     return res.status(200).json(populatedVideo);
   } catch (error) {
     return res.status(500).json({ message: error.message });

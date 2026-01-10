@@ -65,6 +65,7 @@ export const toggleLikesForShort = async (req, res) => {
       short.likes.push(userId);
       short.disLikes.pull(userId);
     }
+    await short.populate("channel");
     await short.save();
     return res.status(200).json(short);
   } catch (error) {
@@ -87,6 +88,7 @@ export const toggleDisLikesForShort = async (req, res) => {
       short.disLikes.push(userId);
       short.likes.pull(userId);
     }
+    await short.populate("channel");
     await short.save();
     return res.status(200).json(short);
   } catch (error) {
@@ -108,6 +110,7 @@ export const toggleSaveForShort = async (req, res) => {
     } else {
       short.saveBy.push(userId);
     }
+    await short.populate("channel");
     await short.save();
     return res.status(200).json(short);
   } catch (error) {
@@ -128,6 +131,7 @@ export const getViewsForShort = async (req, res) => {
     if (!short) {
       return res.status(400).json({ message: "short not found" });
     }
+    await short.populate("channel");
     return res.status(200).json(short);
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -146,11 +150,10 @@ export const addCommentForShort = async (req, res) => {
     }
     short.comments.push({ author: userId, message });
     await short.save();
-    const populatedshort = await Short.findById(shortId).populate({
-      path: "comments.author",
-      select: "userName photoUrl email",
-    });
-    return res.status(200).json(populatedshort);
+    await short.populate("comments.author", "username photoUrl");
+    await short.populate("channel");
+    await short.populate("comments.replies.author", "username photoUrl");
+    return res.status(200).json(short);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -171,12 +174,11 @@ export const addReplyForShort = async (req, res) => {
       return res.status(400).json({ message: "Comment not found" });
     }
     comment.replies.push({ author: userId, message });
-    short.save();
-    const populatedShort = await Short.findById(shortId).populate({
-      path: "comments.replies.author",
-      select: "userName photoUrl email",
-    });
-    return res.status(200).json(populatedShort);
+    await short.save();
+    await short.populate("comments.author", "username photoUrl");
+    await short.populate("channel");
+    await short.populate("comments.replies.author", "username photoUrl");
+    return res.status(200).json(short);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

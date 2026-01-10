@@ -95,6 +95,24 @@ export default function Shorts() {
       console.error(error);
     }
   };
+  const toggleLike = async (shortId) => {
+    try {
+      const result = await axios.put(
+        `${serverUrl}/api/content/short/${shortId}/toggle-like`,
+        {},
+        { withCredentials: true }
+      );
+      const updatedShort = result.data;
+      setShortList((prev) =>
+        prev.map((short) =>
+          short?._id === updatedShort._id ? updatedShort : short
+        )
+      );
+      console.log(result.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
     if (!allShortsData || allShortsData.length === 0) return;
     const shuffled = [...allShortsData].sort(() => Math.random() - 0.5);
@@ -179,6 +197,7 @@ export default function Shorts() {
                   label={"Likes"}
                   active={short?.likes?.includes(userData._id)}
                   count={short?.likes.length}
+                  onClick={() => toggleLike(short?._id)}
                 />
 
                 <IconButton

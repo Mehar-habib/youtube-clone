@@ -120,7 +120,7 @@ export const toggleSubscriber = async (req, res) => {
     if (!channel) {
       return res.status(400).json({ message: "Channel not found" });
     }
-    const isSubscribed = await Channel?.subscribers?.includes(userId);
+    const isSubscribed = channel?.subscribers?.includes(userId);
     if (isSubscribed) {
       channel?.subscribers.pull(userId);
     } else {

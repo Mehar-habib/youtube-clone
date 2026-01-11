@@ -66,7 +66,12 @@ export default function CreatePage() {
 
       {/* Bottom Info / CTA */}
       <div className="w-full max-w-2xl bg-[#181818] border border-[#2a2a2a] rounded-2xl p-6 flex flex-col items-center text-center gap-4">
-        <img src={logo} alt="YouTube" className="w-10 opacity-90" />
+        <img
+          src={logo}
+          alt="YouTube"
+          className="w-10 opacity-90"
+          onClick={() => navigate("/")}
+        />
 
         {!selected ? (
           <>

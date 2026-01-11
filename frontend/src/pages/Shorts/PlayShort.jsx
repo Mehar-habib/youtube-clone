@@ -13,6 +13,7 @@ import {
 import Description from "../../components/Description";
 import axios from "axios";
 import { serverUrl } from "../../App";
+import { useParams } from "react-router-dom";
 
 const IconButton = ({ icon: Icon, active, label, count, onClick }) => {
   return (
@@ -30,8 +31,10 @@ const IconButton = ({ icon: Icon, active, label, count, onClick }) => {
     </button>
   );
 };
-export default function Shorts() {
+export default function PlayShort() {
+  const { shortId } = useParams();
   const { allShortsData } = useSelector((state) => state.content);
+  const selectedShort = allShortsData?.find((short) => short._id === shortId);
   const { userData } = useSelector((state) => state.user);
   const [shortList, setShortList] = useState([]);
   const [playIndex, setPlayIndex] = useState(null);
@@ -43,6 +46,26 @@ export default function Shorts() {
   const [reply, setReply] = useState(false);
   const [replyText, setReplyText] = useState({});
   const shortRefs = useRef([]);
+
+  useEffect(() => {
+    if (!allShortsData || allShortsData.length === 0) return;
+    if (selectedShort) {
+      const selected = allShortsData.find(
+        (short) => short._id === selectedShort._id
+      );
+      const remaining = allShortsData.filter(
+        (short) => short._id !== selectedShort._id
+      );
+
+      if (selected) {
+        setShortList([selected, ...remaining]);
+      } else {
+        setShortList(allShortsData);
+      }
+    } else {
+      setShortList(allShortsData);
+    }
+  }, [allShortsData, selectedShort]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -215,17 +238,12 @@ export default function Shorts() {
       console.error(error);
     }
   };
-  useEffect(() => {
-    if (!allShortsData || allShortsData.length === 0) return;
-    const shuffled = [...allShortsData].sort(() => Math.random() - 0.5);
-    setShortList(shuffled);
-  }, [allShortsData]);
   return (
     <div className="h-[100vh] w-full overflow-y-scroll snap-y snap-mandatory">
       {shortList?.map((short, index) => (
         <div
           key={short?._id}
-          className="min-h-screen w-full flex md:items-center items-start justify-center snap-start pt-10 md:pt-0"
+          className="min-h-screen w-full flex md:items-center mt-12 md:mt-0 items-start justify-center snap-start pt-10 md:pt-0"
         >
           <div
             className="relative w-[420px] md:w-[350px] aspect-[9/16] bg-black rounded-2xl overflow-hidden shadow-xl border border-gray-700 cursor-pointer mt-28 md:mt-0"

@@ -1,12 +1,19 @@
+import { useNavigate } from "react-router-dom";
+
 export default function ShortCard({
   shortUrl,
   title,
   channelName,
   avatar,
   views,
+  id,
 }) {
+  const navigate = useNavigate();
   return (
-    <div className="w-[160px] sm:w-[180px] flex-shrink-0 cursor-pointer">
+    <div
+      className="w-[160px] sm:w-[180px] flex-shrink-0 cursor-pointer"
+      onClick={() => navigate(`play-short/${id}`)}
+    >
       {/* Video */}
       <div className="relative rounded-xl overflow-hidden">
         <video

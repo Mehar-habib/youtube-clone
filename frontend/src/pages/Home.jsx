@@ -62,7 +62,10 @@ export default function Home() {
             <button onClick={() => setSidebarOpen(!sidebarOpen)}>
               <FaBars size={20} />
             </button>
-            <div className="flex items-center gap-2">
+            <div
+              className="flex items-center gap-2"
+              onClick={() => navigate("/")}
+            >
               <img src={logo} alt="logo" className="w-8 h-8" />
               <span className="font-semibold text-lg">YouTube</span>
             </div>
@@ -244,7 +247,10 @@ export default function Home() {
           icon={<SiYoutubeshorts />}
           text="Shorts"
           active={active === "Shorts"}
-          onClick={() => setActive("Shorts")}
+          onClick={() => {
+            setActive("Shorts");
+            navigate("/shorts");
+          }}
         />
         <MobileSizeNav
           icon={<IoIosAddCircle size={40} />}

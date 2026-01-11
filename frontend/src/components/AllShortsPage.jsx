@@ -23,6 +23,7 @@ export default function AllShortsPage() {
             avatar={short.channel?.avatar}
             channelName={short.channel?.name}
             views={short.views}
+            id={short?._id}
           />
         ))}
       </div>

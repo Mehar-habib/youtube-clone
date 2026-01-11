@@ -37,24 +37,38 @@ export default function Shorts() {
   const [playIndex, setPlayIndex] = useState(null);
   const [openComment, setOpenComment] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [viewedShort, setViewedShort] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [reply, setReply] = useState(false);
+  const [replyText, setReplyText] = useState({});
   const shortRefs = useRef([]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const index = Number(entry.target.dataset.index);
-        const video = shortRefs.current[index];
-        if (video) {
-          if (entry.isIntersecting) {
-            video.muted = false;
-            video.play();
-          } else {
-            video.muted = true;
-            video.pause();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const index = Number(entry.target.dataset.index);
+          const video = shortRefs.current[index];
+          if (video) {
+            if (entry.isIntersecting) {
+              video.muted = false;
+              video.play();
+
+              const currentShortId = shortList[index]._id;
+              if (!viewedShort.includes(currentShortId)) {
+                handleAddView(currentShortId);
+                setViewedShort((prev) => [...prev, currentShortId]);
+              }
+            } else {
+              video.muted = true;
+              video.pause();
+            }
           }
-        }
-      });
-    });
+        });
+      },
+      { threshold: 0.7 }
+    );
     shortRefs.current.forEach((video) => {
       if (video) observer.observe(video);
     });
@@ -95,6 +109,19 @@ export default function Shorts() {
       console.error(error);
     }
   };
+  const handleAddView = async (shortId) => {
+    try {
+      await axios.put(
+        `${serverUrl}/api/content/short/${shortId}/add-view`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const toggleLike = async (shortId) => {
     try {
       const result = await axios.put(
@@ -109,6 +136,81 @@ export default function Shorts() {
         )
       );
       console.log(result.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const toggleDisLike = async (shortId) => {
+    try {
+      const result = await axios.put(
+        `${serverUrl}/api/content/short/${shortId}/toggle-dislike`,
+        {},
+        { withCredentials: true }
+      );
+      const updatedShort = result.data;
+      setShortList((prev) =>
+        prev.map((short) =>
+          short?._id === updatedShort._id ? updatedShort : short
+        )
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const toggleSave = async (shortId) => {
+    try {
+      const result = await axios.put(
+        `${serverUrl}/api/content/short/${shortId}/toggle-save`,
+        {},
+        { withCredentials: true }
+      );
+      const updatedShort = result.data;
+      setShortList((prev) =>
+        prev.map((short) =>
+          short?._id === updatedShort._id ? updatedShort : short
+        )
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleAddComment = async (shortId) => {
+    if (!newComment) return;
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/content/short/${shortId}/add-comment`,
+        { message: newComment },
+        { withCredentials: true }
+      );
+      setComments((prev) => ({
+        ...prev,
+        [shortId]: result.data.comments || [],
+      }));
+      setLoading(false);
+      setNewComment("");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleAddReply = async ({ commentId, replyText, shortId }) => {
+    if (!replyText) return;
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/content/short/${shortId}/${commentId}/add-reply`,
+        { message: replyText },
+        { withCredentials: true }
+      );
+      setComments((prev) => ({
+        ...prev,
+        [shortId]: result.data.comments || [],
+      }));
+      setReplyText((prev) => ({
+        ...prev,
+        [commentId]: "",
+      }));
     } catch (error) {
       console.error(error);
     }
@@ -205,11 +307,18 @@ export default function Shorts() {
                   label={"Dislikes"}
                   active={short?.disLikes?.includes(userData._id)}
                   count={short?.disLikes?.length}
+                  onClick={() => toggleDisLike(short?._id)}
                 />
                 <IconButton
                   icon={FaComment}
                   label={"Comment"}
-                  onClick={() => setOpenComment(!openComment)}
+                  onClick={() => {
+                    setOpenComment(!openComment);
+                    setComments((prev) => ({
+                      ...prev,
+                      [short._id]: short.comments,
+                    }));
+                  }}
                 />
 
                 <IconButton
@@ -227,6 +336,7 @@ export default function Shorts() {
                   icon={FaBookmark}
                   label={"Save"}
                   active={short?.saveBy?.includes(userData._id)}
+                  onClick={() => toggleSave(short?._id)}
                 />
               </div>
             </div>
@@ -247,10 +357,99 @@ export default function Shorts() {
                     type="text"
                     className="flex-1 bg-gray-900 text-white p-2 rounded"
                     placeholder="Add a comment"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
                   />
-                  <button className="bg-black px-4 py-2 border border-gray-700 rounded-xl">
+                  <button
+                    className="bg-black px-4 py-2 border border-gray-700 rounded-xl"
+                    onClick={() => handleAddComment(short?._id)}
+                  >
                     Post
                   </button>
+                </div>
+                <div className="space-y-3 mt-4">
+                  {comments[short._id]?.length > 0 ? (
+                    comments[short._id].map((comment) => (
+                      <div
+                        key={comment?._id}
+                        className="bg-gray-800/40 p-2 rounded-lg"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <img
+                            src={comment?.author?.photoUrl}
+                            alt=""
+                            className="w-6 h-6 rounded-full"
+                          />
+                          <h3 className="text-sm font-semibold">
+                            {comment?.author?.userName}
+                          </h3>
+                        </div>
+                        <p className="text-sm ml-8">{comment?.message}</p>
+                        <button
+                          onClick={() => setReply(!reply)}
+                          className="text-red-500 ml-8 mt-2"
+                        >
+                          reply
+                        </button>
+
+                        {reply && (
+                          <div className="mt-2 ml-8 flex gap-2">
+                            <input
+                              type="text"
+                              className="w-full bg-gray-900 text-white text-sm p-2 rounded"
+                              placeholder="Add a reply"
+                              value={replyText[comment._id] || ""}
+                              onChange={(e) =>
+                                setReplyText((prev) => ({
+                                  ...prev,
+                                  [comment._id]: e.target.value,
+                                }))
+                              }
+                            />
+                            <button
+                              className="bg-red-500 px-3 py-1 rounded text-xs"
+                              onClick={() => {
+                                handleAddReply({
+                                  shortId: short._id,
+                                  commentId: comment._id,
+                                  replyText: replyText[comment._id],
+                                });
+                                setReplyText((prev) => ({
+                                  ...prev,
+                                  [comment._id]: "",
+                                }));
+                              }}
+                            >
+                              Reply
+                            </button>
+                          </div>
+                        )}
+
+                        <div className="ml-12 mt-2 space-y-2">
+                          {comment?.replies.map((reply) => (
+                            <div
+                              key={reply?._id}
+                              className="bg-gray-800/40 p-2 rounded-lg"
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <img
+                                  src={reply?.author?.photoUrl}
+                                  alt=""
+                                  className="w-6 h-6 rounded-full"
+                                />
+                                <h3 className="text-sm font-semibold">
+                                  {reply?.author?.userName}
+                                </h3>
+                              </div>
+                              <p className="text-sm ml-8">{reply?.message}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-400">No Comments yet.</p>
+                  )}
                 </div>
               </div>
             )}

@@ -136,3 +136,18 @@ export const toggleSubscriber = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const getAllChannelData = async (req, res) => {
+  try {
+    const channels = await Channel.find()
+      .populate("owner")
+      .populate("videos")
+      .populate("shorts");
+    if (!channels) {
+      return res.status(400).json({ message: "Channels not found" });
+    }
+    return res.status(200).json(channels);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

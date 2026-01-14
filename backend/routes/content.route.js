@@ -21,6 +21,17 @@ import {
   toggleLikesForShort,
   toggleSaveForShort,
 } from "../controller/shortController.js";
+import {
+  CreatePlaylist,
+  toggleSavePlaylist,
+} from "../controller/playListController.js";
+import {
+  addCommentForPost,
+  addReplyForPost,
+  CreatePost,
+  getAllPost,
+  toggleLikesForPost,
+} from "../controller/postController.js";
 
 const router = Router();
 
@@ -50,5 +61,16 @@ router.put("/short/:shortId/toggle-save", isAuth, toggleSaveForShort);
 router.put("/short/:shortId/add-view", getViewsForShort);
 router.post("/short/:shortId/add-comment", isAuth, addCommentForShort);
 router.post("/short/:shortId/:commentId/add-reply", isAuth, addReplyForShort);
+
+// Playlist Route
+router.post("/create-playlist", isAuth, CreatePlaylist);
+router.post("/playlist/toggle-save", isAuth, toggleSavePlaylist);
+
+// Posts routes
+router.post("/create-post", isAuth, upload.single("image"), CreatePost);
+router.get("/get-posts", getAllPost);
+router.get("/post/toggle-like", isAuth, toggleLikesForPost);
+router.get("/post/add-comment ", isAuth, addCommentForPost);
+router.get("/post/add-reply ", isAuth, addReplyForPost);
 
 export default router;

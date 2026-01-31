@@ -12,7 +12,7 @@ export default function ShortCard({
   return (
     <div
       className="w-[160px] sm:w-[180px] flex-shrink-0 cursor-pointer"
-      onClick={() => navigate(`play-short/${id}`)}
+      onClick={() => navigate(`/play-short/${id}`)}
     >
       {/* Video */}
       <div className="relative rounded-xl overflow-hidden">

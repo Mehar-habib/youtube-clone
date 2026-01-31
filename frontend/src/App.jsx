@@ -16,10 +16,10 @@ import CreatePage from "./pages/CreatePage";
 import CreateVideo from "./pages/Videos/CreateVideo";
 import CreateShorts from "./pages/Shorts/CreateShorts";
 import CreatePlaylist from "./pages/Playlist/CreatePlaylist";
-import CreatePost from "./pages/Post/CreatePost";
-import getAllContentData from "./customHooks/getAllcontentData";
-import PlayVideo from "./pages/Videos/PlayVideo";
 import PlayShort from "./pages/Shorts/PlayShort";
+import getAllContentData from "./customHooks/getAllContentData";
+import CreatePost from "./pages/Post/CreatePost";
+import PlayVideo from "./pages/Videos/PlayVideo";
 
 export const serverUrl = "http://localhost:8000";
 

@@ -36,7 +36,7 @@ export const CreatePlaylist = async (req, res) => {
 
 export const toggleSavePlaylist = async (req, res) => {
   try {
-    const { playlistId } = req.params;
+    const { playlistId } = req.body;
     const userId = req.userId;
 
     const playlist = await Playlist.findById(playlistId);

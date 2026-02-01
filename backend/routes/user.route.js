@@ -2,6 +2,7 @@ import { Router } from "express";
 import isAuth from "../middleware/isAuth.js";
 import {
   createChannel,
+  getAllChannelData,
   getChannelData,
   getCurrentUser,
   toggleSubscriber,
@@ -18,7 +19,7 @@ router.post(
     { name: "avatar", maxCount: 1 },
     { name: "banner", maxCount: 1 },
   ]),
-  createChannel
+  createChannel,
 );
 router.get("/get-channel", isAuth, getChannelData);
 router.post(
@@ -28,8 +29,9 @@ router.post(
     { name: "avatar", maxCount: 1 },
     { name: "banner", maxCount: 1 },
   ]),
-  updateChannel
+  updateChannel,
 );
+router.get("/all-channel", isAuth, getAllChannelData);
 router.post("/toggle-subscribe", isAuth, toggleSubscriber);
 
 export default router;

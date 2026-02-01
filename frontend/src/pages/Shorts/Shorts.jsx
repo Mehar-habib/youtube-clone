@@ -13,6 +13,7 @@ import {
 import Description from "../../components/Description";
 import axios from "axios";
 import { serverUrl } from "../../App";
+import { useNavigate } from "react-router-dom";
 
 const IconButton = ({ icon: Icon, active, label, count, onClick }) => {
   return (
@@ -43,6 +44,7 @@ export default function Shorts() {
   const [reply, setReply] = useState(false);
   const [replyText, setReplyText] = useState({});
   const shortRefs = useRef([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -67,7 +69,7 @@ export default function Shorts() {
           }
         });
       },
-      { threshold: 0.7 }
+      { threshold: 0.7 },
     );
     shortRefs.current.forEach((video) => {
       if (video) observer.observe(video);
@@ -93,7 +95,7 @@ export default function Shorts() {
       const result = await axios.post(
         serverUrl + "/api/user/toggle-subscribe",
         { channelId },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       console.log(result.data);
       setLoading(false);
@@ -102,8 +104,8 @@ export default function Shorts() {
         prev.map((short) =>
           short?.channel?._id === channelId
             ? { ...short, channel: updatedChannel }
-            : short
-        )
+            : short,
+        ),
       );
     } catch (error) {
       console.error(error);
@@ -116,7 +118,7 @@ export default function Shorts() {
         {},
         {
           withCredentials: true,
-        }
+        },
       );
     } catch (error) {
       console.error(error);
@@ -127,13 +129,13 @@ export default function Shorts() {
       const result = await axios.put(
         `${serverUrl}/api/content/short/${shortId}/toggle-like`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       const updatedShort = result.data;
       setShortList((prev) =>
         prev.map((short) =>
-          short?._id === updatedShort._id ? updatedShort : short
-        )
+          short?._id === updatedShort._id ? updatedShort : short,
+        ),
       );
       console.log(result.data);
     } catch (error) {
@@ -146,13 +148,13 @@ export default function Shorts() {
       const result = await axios.put(
         `${serverUrl}/api/content/short/${shortId}/toggle-dislike`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       const updatedShort = result.data;
       setShortList((prev) =>
         prev.map((short) =>
-          short?._id === updatedShort._id ? updatedShort : short
-        )
+          short?._id === updatedShort._id ? updatedShort : short,
+        ),
       );
     } catch (error) {
       console.error(error);
@@ -164,13 +166,13 @@ export default function Shorts() {
       const result = await axios.put(
         `${serverUrl}/api/content/short/${shortId}/toggle-save`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       const updatedShort = result.data;
       setShortList((prev) =>
         prev.map((short) =>
-          short?._id === updatedShort._id ? updatedShort : short
-        )
+          short?._id === updatedShort._id ? updatedShort : short,
+        ),
       );
     } catch (error) {
       console.error(error);
@@ -183,7 +185,7 @@ export default function Shorts() {
       const result = await axios.post(
         `${serverUrl}/api/content/short/${shortId}/add-comment`,
         { message: newComment },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setComments((prev) => ({
         ...prev,
@@ -201,7 +203,7 @@ export default function Shorts() {
       const result = await axios.post(
         `${serverUrl}/api/content/short/${shortId}/${commentId}/add-reply`,
         { message: replyText },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setComments((prev) => ({
         ...prev,
@@ -257,8 +259,16 @@ export default function Shorts() {
                   src={short?.channel?.avatar}
                   className="w-8 h-8 rounded-full border border-gray-700"
                   alt=""
+                  onClick={() =>
+                    navigate(`/channel-page/${short?.channel?._id}`)
+                  }
                 />
-                <span className="text-sm text-gray-300">
+                <span
+                  className="text-sm text-gray-300"
+                  onClick={() =>
+                    navigate(`/channel-page/${short?.channel?._id}`)
+                  }
+                >
                   @{short?.channel?.name}
                 </span>
                 <button

@@ -56,15 +56,15 @@ export default function PlayVideo() {
     channel?.subscribers?.some(
       (sub) =>
         sub._id?.toString() === userData._id?.toString() ||
-        sub?.toString() === userData._id?.toString()
-    )
+        sub?.toString() === userData._id?.toString(),
+    ),
   );
 
   const { videoId } = useParams();
   const videoRef = useRef(null);
   const navigate = useNavigate();
   const { allVideosData, allShortsData } = useSelector(
-    (state) => state.content
+    (state) => state.content,
   );
   const dispatch = useDispatch();
 
@@ -87,13 +87,13 @@ export default function PlayVideo() {
         const result = await axios.put(
           `${serverUrl}/api/content/video/${videoId}/add-view`,
           {},
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setVideo((prev) =>
-          prev ? { ...prev, views: result.data.views } : prev
+          prev ? { ...prev, views: result.data.views } : prev,
         );
         const updatedVideo = allVideosData.map((v) =>
-          v._id === videoId ? { ...v, views: result.data.views } : v
+          v._id === videoId ? { ...v, views: result.data.views } : v,
         );
         dispatch(setAllVideosData(updatedVideo));
       } catch (error) {
@@ -108,7 +108,7 @@ export default function PlayVideo() {
     setCurrentTime(videoRef.current.currentTime);
     setDuration(videoRef.current.duration);
     setProgress(
-      (videoRef.current.currentTime / videoRef.current.duration) * 100
+      (videoRef.current.currentTime / videoRef.current.duration) * 100,
     );
   };
   const handleSeek = (e) => {
@@ -166,7 +166,7 @@ export default function PlayVideo() {
       const result = await axios.post(
         serverUrl + "/api/user/toggle-subscribe",
         { channelId: channel._id },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setChannel((prev) => ({
         ...prev,
@@ -184,11 +184,11 @@ export default function PlayVideo() {
       const result = await axios.put(
         `${serverUrl}/api/content/video/${videoId}/toggle-like`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setVideo(result.data);
       const updatedVideos = allVideosData.map((v) =>
-        v._id === videoId ? result.data : v
+        v._id === videoId ? result.data : v,
       );
       dispatch(setAllVideosData(updatedVideos));
     } catch (error) {
@@ -200,11 +200,11 @@ export default function PlayVideo() {
       const result = await axios.put(
         `${serverUrl}/api/content/video/${videoId}/toggle-dislike`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setVideo(result.data);
       const updatedVideos = allVideosData.map((v) =>
-        v._id === videoId ? result.data : v
+        v._id === videoId ? result.data : v,
       );
       dispatch(setAllVideosData(updatedVideos));
     } catch (error) {
@@ -216,12 +216,12 @@ export default function PlayVideo() {
       const result = await axios.put(
         `${serverUrl}/api/content/video/${videoId}/toggle-save`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setVideo(result.data);
       console.log(result.data);
       const updatedVideos = allVideosData.map((v) =>
-        v._id === videoId ? result.data : v
+        v._id === videoId ? result.data : v,
       );
       dispatch(setAllVideosData(updatedVideos));
     } catch (error) {
@@ -236,7 +236,7 @@ export default function PlayVideo() {
       const result = await axios.post(
         `${serverUrl}/api/content/video/${videoId}/add-comment`,
         { message: newComment },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setComment((prev) => [result.data?.comments.slice(-1)[0], ...prev]);
       setLoading(false);
@@ -253,7 +253,7 @@ export default function PlayVideo() {
       const result = await axios.post(
         `${serverUrl}/api/content/video/${videoId}/${commentId}/add-reply`,
         { message: replyText },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setComment(result.data?.comments);
       setLoading(false);
@@ -269,8 +269,8 @@ export default function PlayVideo() {
       channel?.subscribers?.some(
         (sub) =>
           sub._id?.toString() === userData._id?.toString() ||
-          sub?.toString() === userData._id?.toString()
-      )
+          sub?.toString() === userData._id?.toString(),
+      ),
     );
   }, [channel?.subscribers, userData?._id]);
   return (
@@ -383,9 +383,15 @@ export default function PlayVideo() {
               src={channel?.avatar}
               alt=""
               className="w-12 h-12 rounded-full border-2 border-gray-600"
+              onClick={() => navigate(`/channel-page/${channel?._id}`)}
             />
             <div>
-              <h1 className="font-bold">{channel?.name}</h1>
+              <h1
+                className="font-bold"
+                onClick={() => navigate(`/channel-page/${channel?._id}`)}
+              >
+                {channel?.name}
+              </h1>
               <h3 className="text-[13px]">{channel?.subscribers?.length}</h3>
             </div>
             <button
@@ -399,8 +405,8 @@ export default function PlayVideo() {
               {loading
                 ? "Loading..."
                 : isSubscribed
-                ? "Subscribed"
-                : "Subscribe"}
+                  ? "Subscribed"
+                  : "Subscribe"}
             </button>
           </div>
           <div className="flex items-center gap-6 mt-3">

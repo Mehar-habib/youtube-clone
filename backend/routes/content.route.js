@@ -42,7 +42,7 @@ router.post(
     { name: "video", maxCount: 1 },
     { name: "thumbnail", maxCount: 1 },
   ]),
-  createVideo
+  createVideo,
 );
 router.get("/get-videos", isAuth, getAllVideos);
 router.post("/create-short", isAuth, upload.single("shortUrl"), createShort);
@@ -69,8 +69,8 @@ router.post("/playlist/toggle-save", isAuth, toggleSavePlaylist);
 // Posts routes
 router.post("/create-post", isAuth, upload.single("image"), CreatePost);
 router.get("/get-posts", getAllPost);
-router.get("/post/toggle-like", isAuth, toggleLikesForPost);
-router.get("/post/add-comment ", isAuth, addCommentForPost);
-router.get("/post/add-reply ", isAuth, addReplyForPost);
+router.post("/post/toggle-like", isAuth, toggleLikesForPost);
+router.post("/post/add-comment ", isAuth, addCommentForPost);
+router.post("/post/add-reply ", isAuth, addReplyForPost);
 
 export default router;

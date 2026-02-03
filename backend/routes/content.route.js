@@ -8,6 +8,7 @@ import {
   getAllVideos,
   getLikedShorts,
   getLikedVideos,
+  getSavedVideos,
   getViews,
   toggleDisLikes,
   toggleLikes,
@@ -18,6 +19,7 @@ import {
   addReplyForShort,
   createShort,
   getAllShorts,
+  getSavedShorts,
   getViewsForShort,
   toggleDisLikesForShort,
   toggleLikesForShort,
@@ -56,6 +58,7 @@ router.put("/video/:videoId/add-view", getViews);
 router.post("/video/:videoId/add-comment", isAuth, addComment);
 router.post("/video/:videoId/:commentId/add-reply", isAuth, addReply);
 router.get("/liked-video", isAuth, getLikedVideos);
+router.get("/saved-video", isAuth, getSavedVideos);
 
 // shorts routes
 router.put("/short/:shortId/toggle-like", isAuth, toggleLikesForShort);
@@ -65,6 +68,7 @@ router.put("/short/:shortId/add-view", getViewsForShort);
 router.post("/short/:shortId/add-comment", isAuth, addCommentForShort);
 router.post("/short/:shortId/:commentId/add-reply", isAuth, addReplyForShort);
 router.get("/liked-short", isAuth, getLikedShorts);
+router.get("/saved-short", isAuth, getSavedShorts);
 
 // Playlist Route
 router.post("/create-playlist", isAuth, CreatePlaylist);

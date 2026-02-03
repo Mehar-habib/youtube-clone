@@ -120,7 +120,11 @@ export default function MobileProfile() {
       <div className="space-y-1">
         <ProfileMenuItem icon={<FaHistory />} text="History" />
         <ProfileMenuItem icon={<FaList />} text="Playlists" />
-        <ProfileMenuItem icon={<GoVideo />} text="Saved videos" />
+        <ProfileMenuItem
+          icon={<GoVideo />}
+          text="Saved videos"
+          onClick={() => navigate("/saved-content")}
+        />
         <ProfileMenuItem
           icon={<FaThumbsUp />}
           text="Liked videos"

@@ -185,7 +185,10 @@ export default function Home() {
             text="Save Videos"
             open={sidebarOpen}
             selected={selectedItem === "Save Videos"}
-            onClick={() => setSelectedItem("Save Videos")}
+            onClick={() => {
+              setSelectedItem("Save Videos");
+              navigate("/saved-content");
+            }}
           />
           <SidebarItem
             icon={<FaThumbsUp />}

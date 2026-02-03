@@ -237,3 +237,18 @@ export const getLikedShorts = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const getSavedVideos = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const savedVideo = await Video.find({ saveBy: userId })
+      .populate("channel", "name avatar")
+      .populate("saveBy", "username");
+    if (!savedVideo) {
+      return res.status(400).json({ message: "Videos not found" });
+    }
+    return res.status(200).json(savedVideo);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

@@ -22,6 +22,7 @@ import CreatePost from "./pages/Post/CreatePost";
 import PlayVideo from "./pages/Videos/PlayVideo";
 import ChannelPage from "./pages/channel/ChannelPage";
 import LikedContent from "./pages/likedContnet/LikedContent";
+import SavedContent from "./pages/savedContent/SavedContent";
 
 export const serverUrl = "http://localhost:8000";
 
@@ -136,6 +137,14 @@ export default function App() {
             element={
               <ProtectRoute userData={userData}>
                 <LikedContent />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/saved-content"
+            element={
+              <ProtectRoute userData={userData}>
+                <SavedContent />
               </ProtectRoute>
             }
           />

@@ -28,7 +28,7 @@ export const createShort = async (req, res) => {
     await Channel.findByIdAndUpdate(
       channelData._id,
       { $push: { shorts: newShort._id } },
-      { new: true }
+      { new: true },
     );
     return res.status(200).json(newShort);
   } catch (error) {
@@ -130,7 +130,7 @@ export const getViewsForShort = async (req, res) => {
       {
         $inc: { views: 1 },
       },
-      { new: true }
+      { new: true },
     );
     if (!short) {
       return res.status(400).json({ message: "short not found" });
@@ -185,6 +185,21 @@ export const addReplyForShort = async (req, res) => {
     await short.populate("channel");
     await short.populate("comments.replies.author", "userName photoUrl");
     return res.status(200).json(short);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSavedShorts = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const savedShort = await Short.find({ saveBy: userId })
+      .populate("channel", "name avatar")
+      .populate("saveBy", "username");
+    if (!savedShort) {
+      return res.status(400).json({ message: "Short not found" });
+    }
+    return res.status(200).json(savedShort);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

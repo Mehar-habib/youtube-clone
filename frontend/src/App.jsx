@@ -21,6 +21,7 @@ import getAllContentData from "./customHooks/getAllContentData";
 import CreatePost from "./pages/Post/CreatePost";
 import PlayVideo from "./pages/Videos/PlayVideo";
 import ChannelPage from "./pages/channel/ChannelPage";
+import LikedContent from "./pages/likedContnet/LikedContent";
 
 export const serverUrl = "http://localhost:8000";
 
@@ -127,6 +128,14 @@ export default function App() {
             element={
               <ProtectRoute userData={userData}>
                 <ChannelPage />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/liked-content"
+            element={
+              <ProtectRoute userData={userData}>
+                <LikedContent />
               </ProtectRoute>
             }
           />

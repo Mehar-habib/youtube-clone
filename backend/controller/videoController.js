@@ -1,5 +1,6 @@
 import uploadOnCloudinary from "../config/cloudinary.js";
 import Channel from "../model/channelModel.js";
+import Short from "../model/shortModel.js";
 import Video from "../model/videoModel.js";
 
 export const createVideo = async (req, res) => {
@@ -16,7 +17,7 @@ export const createVideo = async (req, res) => {
     }
     const uploadVideo = await uploadOnCloudinary(req.files.video[0].path);
     const uploadThumbnail = await uploadOnCloudinary(
-      req.files.thumbnail[0].path
+      req.files.thumbnail[0].path,
     );
 
     let parsedTag = [];
@@ -42,7 +43,7 @@ export const createVideo = async (req, res) => {
       {
         $push: { videos: newVideo._id },
       },
-      { new: true }
+      { new: true },
     );
 
     return res.status(201).json(newVideo);
@@ -138,7 +139,7 @@ export const getViews = async (req, res) => {
       {
         $inc: { views: 1 },
       },
-      { new: true }
+      { new: true },
     );
     if (!video) {
       return res.status(400).json({ message: "Video not found" });
@@ -202,6 +203,36 @@ export const addReply = async (req, res) => {
         select: "userName photoUrl email",
       });
     return res.status(200).json(populatedVideo);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getLikedVideos = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const likedVideo = await Video.find({ likes: userId })
+      .populate("channel", "name avatar")
+      .populate("likes", "username");
+    if (!likedVideo) {
+      return res.status(400).json({ message: "Videos not found" });
+    }
+    return res.status(200).json(likedVideo);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getLikedShorts = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const likedShort = await Short.find({ likes: userId })
+      .populate("channel", "name avatar")
+      .populate("likes", "username");
+    if (!likedShort) {
+      return res.status(400).json({ message: "Short not found" });
+    }
+    return res.status(200).json(likedShort);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

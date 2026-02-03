@@ -192,7 +192,10 @@ export default function Home() {
             text="Liked Videos"
             open={sidebarOpen}
             selected={selectedItem === "Liked Videos"}
-            onClick={() => setSelectedItem("Liked Videos")}
+            onClick={() => {
+              setSelectedItem("Liked Videos");
+              navigate("/liked-content");
+            }}
           />
         </nav>
       </aside>

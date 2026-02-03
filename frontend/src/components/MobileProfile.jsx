@@ -36,7 +36,7 @@ export default function MobileProfile() {
         formData,
         {
           withCredentials: true,
-        }
+        },
       );
       dispatch(setUserData(result.data));
       navigate("/");
@@ -121,7 +121,11 @@ export default function MobileProfile() {
         <ProfileMenuItem icon={<FaHistory />} text="History" />
         <ProfileMenuItem icon={<FaList />} text="Playlists" />
         <ProfileMenuItem icon={<GoVideo />} text="Saved videos" />
-        <ProfileMenuItem icon={<FaThumbsUp />} text="Liked videos" />
+        <ProfileMenuItem
+          icon={<FaThumbsUp />}
+          text="Liked videos"
+          onClick={() => navigate("/liked-content")}
+        />
         <ProfileMenuItem icon={<SiYoutubestudio />} text="YouTube Studio" />
       </div>
     </div>

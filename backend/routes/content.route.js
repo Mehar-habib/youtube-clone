@@ -27,6 +27,7 @@ import {
 } from "../controller/shortController.js";
 import {
   CreatePlaylist,
+  getSavedPlaylist,
   toggleSavePlaylist,
 } from "../controller/playListController.js";
 import {
@@ -73,6 +74,7 @@ router.get("/saved-short", isAuth, getSavedShorts);
 // Playlist Route
 router.post("/create-playlist", isAuth, CreatePlaylist);
 router.post("/playlist/toggle-save", isAuth, toggleSavePlaylist);
+router.get("/saved-playlist", isAuth, getSavedPlaylist);
 
 // Posts routes
 router.post("/create-post", isAuth, upload.single("image"), CreatePost);

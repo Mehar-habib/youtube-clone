@@ -178,7 +178,10 @@ export default function Home() {
             text="Playlist"
             open={sidebarOpen}
             selected={selectedItem === "Playlist"}
-            onClick={() => setSelectedItem("Playlist")}
+            onClick={() => {
+              setSelectedItem("Playlist");
+              navigate("/saved-playlist");
+            }}
           />
           <SidebarItem
             icon={<GoVideo />}

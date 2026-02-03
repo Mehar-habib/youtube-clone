@@ -54,3 +54,21 @@ export const toggleSavePlaylist = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const getSavedPlaylist = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const savedPlaylist = await Playlist.find({ saveBy: userId })
+      .populate("videos")
+      .populate({
+        path: "videos",
+        populate: { path: "channel" },
+      });
+    if (!savedPlaylist) {
+      return res.status(400).json({ message: "Playlist not found" });
+    }
+    return res.status(200).json(savedPlaylist);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

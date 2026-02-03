@@ -70,7 +70,7 @@ router.post("/playlist/toggle-save", isAuth, toggleSavePlaylist);
 router.post("/create-post", isAuth, upload.single("image"), CreatePost);
 router.get("/get-posts", getAllPost);
 router.post("/post/toggle-like", isAuth, toggleLikesForPost);
-router.post("/post/add-comment ", isAuth, addCommentForPost);
-router.post("/post/add-reply ", isAuth, addReplyForPost);
+router.post("/post/add-comment", isAuth, addCommentForPost);
+router.post("/post/add-reply", isAuth, addReplyForPost);
 
 export default router;

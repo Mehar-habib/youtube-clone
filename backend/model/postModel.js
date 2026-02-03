@@ -20,13 +20,11 @@ const commentSchema = new mongoose.Schema(
     message: {
       type: String,
     },
-    replies: {
-      replySchema,
-    },
+    replies: [replySchema],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date },
   },
-  { _id: true }
+  { _id: true },
 );
 const postSchema = new mongoose.Schema(
   {
@@ -49,11 +47,9 @@ const postSchema = new mongoose.Schema(
       },
     ],
 
-    comments: {
-      commentSchema,
-    },
+    comments: [commentSchema],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Post = mongoose.model("Post", postSchema);

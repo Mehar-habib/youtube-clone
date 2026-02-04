@@ -265,6 +265,26 @@ export default function PlayVideo() {
   };
 
   useEffect(() => {
+    const addHistory = async () => {
+      try {
+        await axios.post(
+          `${serverUrl}/api/user/add-history`,
+          {
+            contentId: videoId,
+            contentType: "Video",
+          },
+          {
+            withCredentials: true,
+          },
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (videoId) addHistory();
+  }, [videoId]);
+
+  useEffect(() => {
     setIsSubscribed(
       channel?.subscribers?.some(
         (sub) =>

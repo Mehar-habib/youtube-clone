@@ -45,6 +45,7 @@ export default function Shorts() {
   const [replyText, setReplyText] = useState({});
   const shortRefs = useRef([]);
   const navigate = useNavigate();
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -56,6 +57,7 @@ export default function Shorts() {
             if (entry.isIntersecting) {
               video.muted = false;
               video.play();
+              setActiveIndex(index);
 
               const currentShortId = shortList[index]._id;
               if (!viewedShort.includes(currentShortId)) {
@@ -222,6 +224,27 @@ export default function Shorts() {
     const shuffled = [...allShortsData].sort(() => Math.random() - 0.5);
     setShortList(shuffled);
   }, [allShortsData]);
+  useEffect(() => {
+    const addHistory = async () => {
+      try {
+        const shortId = shortList[activeIndex]?._id;
+        if (!shortId) return;
+        await axios.post(
+          `${serverUrl}/api/user/add-history`,
+          {
+            contentId: shortId,
+            contentType: "Short",
+          },
+          {
+            withCredentials: true,
+          },
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (shortList.length > 0) addHistory();
+  }, [activeIndex, shortList]);
   return (
     <div className="h-[100vh] w-full overflow-y-scroll snap-y snap-mandatory">
       {shortList?.map((short, index) => (

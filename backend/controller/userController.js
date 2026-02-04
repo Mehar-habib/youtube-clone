@@ -1,6 +1,8 @@
 import uploadOnCloudinary from "../config/cloudinary.js";
 import Channel from "../model/channelModel.js";
+import Short from "../model/shortModel.js";
 import User from "../model/userModel.js";
+import Video from "../model/videoModel.js";
 
 export const getCurrentUser = async (req, res) => {
   try {
@@ -232,6 +234,57 @@ export const getSubscribedData = async (req, res) => {
     return res
       .status(200)
       .json({ videos, shorts, playlists, posts, subscribedChannels });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const addHistory = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { contentId, contentType } = req.body;
+
+    if (!["Video", "Short"].includes(contentType)) {
+      return res.status(400).json({ message: "Invalid content type" });
+    }
+    let content;
+    if (contentType === "Video") {
+      content = await Video.findById(contentId);
+    } else {
+      content = await Short.findById(contentId);
+    }
+    if (!content)
+      return res.status(400).json({ message: `${contentType} not found` });
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { history: { contentId, contentType } },
+    });
+    await User.findByIdAndUpdate(userId, {
+      $push: { history: { contentId, contentType, watchedAt: new Date() } },
+    });
+
+    return res.status(200).json({ message: "History updated" });
+  } catch {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getHistory = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId)
+      .populate({
+        path: "history.contentId",
+        populate: { path: "channel", select: "name avatar" },
+      })
+      .select("history");
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    const sortedHistory = [...user.history].sort((a, b) => {
+      new Date(b.watchedAt) - new Date(a.watchedAt);
+    });
+    return res.status(200).json(sortedHistory);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

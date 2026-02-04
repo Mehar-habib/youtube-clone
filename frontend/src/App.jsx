@@ -26,6 +26,8 @@ import SavedContent from "./pages/savedContent/SavedContent";
 import SavedPlaylist from "./pages/Playlist/SavedPlaylist";
 import GetSubscribedData from "./customHooks/GetSubscribedData";
 import Subscription from "./pages/subscription/Subscription";
+import GetHistory from "./customHooks/GetHistory";
+import History from "./pages/History/History";
 
 export const serverUrl = "http://localhost:8000";
 
@@ -41,6 +43,7 @@ export default function App() {
   getChannelData();
   getAllContentData();
   GetSubscribedData();
+  GetHistory();
   const { userData } = useSelector((state) => state.user);
   const ChannelPageWrapper = () => {
     const location = useLocation();
@@ -169,6 +172,14 @@ export default function App() {
             element={
               <ProtectRoute userData={userData}>
                 <Subscription />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <ProtectRoute userData={userData}>
+                <History />
               </ProtectRoute>
             }
           />

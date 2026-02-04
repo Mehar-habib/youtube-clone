@@ -1,10 +1,12 @@
 import { Router } from "express";
 import isAuth from "../middleware/isAuth.js";
 import {
+  addHistory,
   createChannel,
   getAllChannelData,
   getChannelData,
   getCurrentUser,
+  getHistory,
   getSubscribedData,
   toggleSubscriber,
   updateChannel,
@@ -35,5 +37,7 @@ router.post(
 router.get("/all-channel", isAuth, getAllChannelData);
 router.post("/toggle-subscribe", isAuth, toggleSubscriber);
 router.get("/subscribed-data", isAuth, getSubscribedData);
+router.post("/add-history", isAuth, addHistory);
+router.get("/get-history", isAuth, getHistory);
 
 export default router;

@@ -118,7 +118,11 @@ export default function MobileProfile() {
 
       {/* Menu Items */}
       <div className="space-y-1">
-        <ProfileMenuItem icon={<FaHistory />} text="History" />
+        <ProfileMenuItem
+          icon={<FaHistory />}
+          text="History"
+          onClick={() => navigate("/history")}
+        />
         <ProfileMenuItem
           icon={<FaList />}
           text="Playlists"

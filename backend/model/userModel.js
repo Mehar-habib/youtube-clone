@@ -22,6 +22,23 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Channel",
     },
+    history: [
+      {
+        contentId: {
+          type: mongoose.Schema.Types.ObjectId,
+          refPath: "history.contentType", // dynamically decide karega video ya short
+        },
+        contentType: {
+          type: String,
+          enum: ["Video", "Short"],
+          required: true,
+        },
+        watchedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     resetOtp: {
       type: String,
     },
@@ -35,7 +52,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const User = mongoose.model("User", userSchema);

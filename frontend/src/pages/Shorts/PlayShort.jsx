@@ -239,6 +239,25 @@ export default function PlayShort() {
       console.error(error);
     }
   };
+  useEffect(() => {
+    const addHistory = async () => {
+      try {
+        await axios.post(
+          `${serverUrl}/api/user/add-history`,
+          {
+            contentId: shortId,
+            contentType: "Short",
+          },
+          {
+            withCredentials: true,
+          },
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (shortId) addHistory();
+  }, [shortId]);
   return (
     <div className="h-[100vh] w-full overflow-y-scroll snap-y snap-mandatory">
       {shortList?.map((short, index) => (

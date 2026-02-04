@@ -5,6 +5,7 @@ import {
   getAllChannelData,
   getChannelData,
   getCurrentUser,
+  getSubscribedData,
   toggleSubscriber,
   updateChannel,
 } from "../controller/userController.js";
@@ -33,5 +34,6 @@ router.post(
 );
 router.get("/all-channel", isAuth, getAllChannelData);
 router.post("/toggle-subscribe", isAuth, toggleSubscriber);
+router.get("/subscribed-data", isAuth, getSubscribedData);
 
 export default router;

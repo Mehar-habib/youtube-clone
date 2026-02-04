@@ -31,7 +31,7 @@ export default function Home() {
   const [active, setActive] = useState("Home");
   const navigate = useNavigate();
   const location = useLocation();
-  const { userData } = useSelector((state) => state.user);
+  const { userData, subscribedChannels } = useSelector((state) => state.user);
   const [popup, setPopup] = useState(false);
 
   const categories = [
@@ -158,7 +158,10 @@ export default function Home() {
             text="Subscriptions"
             open={sidebarOpen}
             selected={selectedItem === "Subscriptions"}
-            onClick={() => setSelectedItem("Subscriptions")}
+            onClick={() => {
+              setSelectedItem("Subscriptions");
+              navigate("/subscription");
+            }}
           />
         </nav>
 
@@ -204,6 +207,33 @@ export default function Home() {
             }}
           />
         </nav>
+
+        {/* subscription */}
+        <hr className="border-gray-800 my-3" />
+        {sidebarOpen && (
+          <p className="text-gray-400 text-sm px-2">Subscriptions</p>
+        )}
+        <div className="space-y-1 mt-1">
+          {subscribedChannels?.map((ch) => (
+            <button
+              key={ch?._id}
+              onClick={() => {
+                setSelectedItem(ch?._id);
+                navigate(`/channel-page/${ch?._id}`);
+              }}
+              className={`flex items-center ${sidebarOpen ? "gap-3 justify-start" : "justify-center"} w-full text-left cursor-pointer p-2 rounded-lg transition ${selectedItem === ch?._id ? "bg-[#272727]" : "hover:bg-gray-800"}`}
+            >
+              <img
+                src={ch?.avatar}
+                alt=""
+                className="w-6 h-6 rounded-full border border-gray-700 object-cover hover:scale-110 transition-transform duration-200"
+              />
+              {sidebarOpen && (
+                <span className="text-sm truncate text-white">{ch?.name}</span>
+              )}
+            </button>
+          ))}
+        </div>
       </aside>
 
       {/* Main content */}
@@ -273,7 +303,10 @@ export default function Home() {
           icon={<MdOutlineSubscriptions />}
           text="Subscriptions"
           active={active === "Subscriptions"}
-          onClick={() => setActive("Subscriptions")}
+          onClick={() => {
+            setActive("Subscriptions");
+            navigate("/subscription");
+          }}
         />
         <MobileSizeNav
           icon={

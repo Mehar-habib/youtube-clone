@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
@@ -24,6 +24,8 @@ import ChannelPage from "./pages/channel/ChannelPage";
 import LikedContent from "./pages/likedContnet/LikedContent";
 import SavedContent from "./pages/savedContent/SavedContent";
 import SavedPlaylist from "./pages/Playlist/SavedPlaylist";
+import GetSubscribedData from "./customHooks/GetSubscribedData";
+import Subscription from "./pages/subscription/Subscription";
 
 export const serverUrl = "http://localhost:8000";
 
@@ -38,7 +40,12 @@ export default function App() {
   getCurrentUser();
   getChannelData();
   getAllContentData();
+  GetSubscribedData();
   const { userData } = useSelector((state) => state.user);
+  const ChannelPageWrapper = () => {
+    const location = useLocation();
+    return <ChannelPage key={location.pathname} />;
+  };
   return (
     <>
       <CustomAlert />
@@ -129,7 +136,7 @@ export default function App() {
             path="/channel-page/:channelId"
             element={
               <ProtectRoute userData={userData}>
-                <ChannelPage />
+                <ChannelPageWrapper />
               </ProtectRoute>
             }
           />
@@ -154,6 +161,14 @@ export default function App() {
             element={
               <ProtectRoute userData={userData}>
                 <SavedPlaylist />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/subscription"
+            element={
+              <ProtectRoute userData={userData}>
+                <Subscription />
               </ProtectRoute>
             }
           />

@@ -182,3 +182,57 @@ export const getAllChannelData = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const getSubscribedData = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const subscribedChannels = await Channel.find({ subscribers: userId })
+      .populate({
+        path: "videos",
+        populate: { path: "channel", select: "name avatar" },
+      })
+      .populate({
+        path: "shorts",
+        populate: { path: "channel", select: "name avatar" },
+      })
+      .populate({
+        path: "playlists",
+        populate: { path: "channel", select: "name avatar" },
+        populate: {
+          path: "videos",
+          populate: { path: "channel" },
+        },
+      })
+      .populate({
+        path: "communityPosts",
+        populate: [
+          { path: "channel", select: "name avatar" },
+          {
+            path: "comments.author",
+            select: "userName photoUrl email",
+          },
+          {
+            path: "comments.replies.author",
+            select: "userName photoUrl email",
+          },
+        ],
+      });
+    if (!subscribedChannels) {
+      return res.status(400).json({ message: "Channels not found" });
+    }
+    const videos = subscribedChannels.flatMap((channel) => channel.videos);
+    const shorts = subscribedChannels.flatMap((channel) => channel.shorts);
+    const playlists = subscribedChannels.flatMap(
+      (channel) => channel.playlists,
+    );
+    const posts = subscribedChannels.flatMap(
+      (channel) => channel.communityPosts,
+    );
+
+    return res
+      .status(200)
+      .json({ videos, shorts, playlists, posts, subscribedChannels });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

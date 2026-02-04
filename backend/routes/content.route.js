@@ -37,6 +37,7 @@ import {
   getAllPost,
   toggleLikesForPost,
 } from "../controller/postController.js";
+import { searchWithAi } from "../controller/aiController.js";
 
 const router = Router();
 
@@ -82,5 +83,8 @@ router.get("/get-posts", getAllPost);
 router.post("/post/toggle-like", isAuth, toggleLikesForPost);
 router.post("/post/add-comment", isAuth, addCommentForPost);
 router.post("/post/add-reply", isAuth, addReplyForPost);
+
+// AI route
+router.post("/search", isAuth, searchWithAi);
 
 export default router;

@@ -9,6 +9,7 @@ import {
   FaThumbsUp,
   FaSearch,
   FaMicrophone,
+  FaTimes,
 } from "react-icons/fa";
 import { SiYoutubeshorts } from "react-icons/si";
 import {
@@ -33,6 +34,7 @@ export default function Home() {
   const location = useLocation();
   const { userData, subscribedChannels } = useSelector((state) => state.user);
   const [popup, setPopup] = useState(false);
+  const [searchPopup, setSearchPopup] = useState(false);
 
   const categories = [
     "Music",
@@ -54,6 +56,39 @@ export default function Home() {
 
   return (
     <div className="bg-[#0f0f0f] text-white min-h-screen relative">
+      {searchPopup && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="bg-[#1f1f1f]/90 backdrop-blur-md rounded-2xl shadow-2xl w-[90%] max-w-md min-h-[400px] sm:min-h-[480px] p-8 flex flex-col items-center justify-between gap-8 relative border border-gray-700 transition-all duration-300">
+            <button
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+              onClick={() => setSearchPopup(false)}
+            >
+              <FaTimes size={22} />
+            </button>
+
+            <div className="flex flex-col items-center gap-3">
+              <h1 className="text-lg sm:text-xl font-medium text-gray-300">
+                Speak or type your query
+              </h1>
+
+              <div className="flex w-full gap-2 md:hidden mt-4">
+                <input
+                  type="text"
+                  className="flex-1 px-4 py-2 rounded-full bg-[#2a2a2a] text-white outline-none border border-gray-600 focus:border-red-400 focus:ring-2 focus:ring-red-500 transition"
+                  placeholder="Type your search"
+                />
+                <button className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full text-white font-semibold shadow-md transition disabled:opacity-50">
+                  <FaSearch />
+                </button>
+              </div>
+            </div>
+            <button className="p-6 rounded-full shadow-xl transition-all duration-300 transform hover:scale-110 bg-red-500 hover:bg-red-600 shadow-red-500/40">
+              <FaMicrophone size={24} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Navbar */}
       <header className="bg-[#0f0f0f] h-15 p-3 border-b border-gray-800 fixed top-0 left-0 right-0 z-50">
         <div className="flex items-center justify-between">
@@ -83,7 +118,10 @@ export default function Home() {
                 <FaSearch />
               </button>
             </div>
-            <button className="p-3 bg-[#272727] rounded-full">
+            <button
+              className="p-3 bg-[#272727] rounded-full"
+              onClick={() => setSearchPopup(!searchPopup)}
+            >
               <FaMicrophone />
             </button>
           </div>
@@ -121,7 +159,10 @@ export default function Home() {
                 onClick={() => setPopup(true)}
               />
             )}
-            <FaSearch className="text-lg md:hidden flex" />
+            <FaSearch
+              className="text-lg md:hidden flex"
+              onClick={() => setSearchPopup(!searchPopup)}
+            />
           </div>
         </div>
       </header>

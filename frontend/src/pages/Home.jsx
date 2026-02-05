@@ -29,6 +29,7 @@ import { showCustomAlert } from "../components/CustomAlert";
 import axios from "axios";
 import { serverUrl } from "../App";
 import SearchResult from "../components/SearchResult";
+import FilterResult from "../components/FilterResult";
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -43,6 +44,7 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchData, setSearchData] = useState("");
+  const [filterData, setFilterData] = useState("");
 
   function speak(message) {
     let utterance = new SpeechSynthesisUtterance(message);
@@ -149,6 +151,44 @@ export default function Home() {
     "Fashion",
     "Travel",
   ];
+  const handleCategoryFilter = async (category) => {
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        serverUrl + "/api/content/filter",
+        { input: category },
+        { withCredentials: true },
+      );
+      const { videos = [], shorts = [], channels = [] } = result.data;
+
+      let channelVideos = [];
+      let channelShorts = [];
+      channels.forEach((ch) => {
+        if (ch.videos?.length) channelVideos.push(...ch.videos);
+        if (ch.shorts?.length) channelShorts.push(...ch.shorts);
+      });
+      setFilterData({
+        ...result.data,
+        videos: [...videos, ...channelVideos],
+        shorts: [...shorts, ...channelShorts],
+      });
+      setLoading(false);
+      navigate("/");
+      if (
+        videos.length > 0 ||
+        shorts.length > 0 ||
+        channelVideos.length > 0 ||
+        channelShorts.length > 0
+      ) {
+        speak(`Here are some ${category} videos and shorts for you`);
+      } else {
+        speak("No results found");
+      }
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-[#0f0f0f] text-white min-h-screen relative">
@@ -416,6 +456,7 @@ export default function Home() {
                 <button
                   key={idx}
                   className="px-3 py-1 rounded-full bg-[#272727] hover:bg-[#3a3a3a] whitespace-nowrap transition"
+                  onClick={() => handleCategoryFilter(category)}
                 >
                   {category}
                 </button>
@@ -423,7 +464,13 @@ export default function Home() {
             </div>
 
             <div className="mt-3">
+              {loading && (
+                <div className="w-full items-center flex justify-center">
+                  {loading ? "Loading..." : "No videos found"}
+                </div>
+              )}
               {searchData && <SearchResult searchResults={searchData} />}
+              {filterData && <FilterResult filterResults={filterData} />}
               <AllVideosPage />
               <AllShortsPage />
             </div>

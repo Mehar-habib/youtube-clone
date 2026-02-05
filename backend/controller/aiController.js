@@ -100,3 +100,95 @@ export const searchWithAi = async (req, res) => {
     });
   }
 };
+
+export const filterCategoryWithAi = async (req, res) => {
+  try {
+    const { input } = req.body;
+    if (!input) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+    const ai = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+    });
+    const categories = [
+      "Music",
+      "Movies",
+      "Gaming",
+      "News",
+      "Sports",
+      "Education",
+      "Comedy",
+      "Vlogs",
+      "Science & Tech",
+      "Entertainment",
+      "Art",
+      "Pets",
+      "Cooking",
+      "Fashion",
+      "Travel",
+    ];
+    const prompt = `You are a category classifier for a video streaming platform. the user query is : "${input}"
+    Your job:
+    - Match this query with the most relevant categories from the list:
+    ${categories.join(", ")}
+    - If more then one category fits, return them comma separated.
+    - If noting fits, return single closest category.
+    - Do not explain, Do not return JSON. Only return category names.
+
+    Examples:
+    - "atif aslam songs" -> "Music"
+    - "pubg gameplay" -> "Gaming"
+    - "pakistan latest news" -> "News"
+    - "funny animal video" -> "Comedy, Pets"
+    - "fitness tips" -> "Eduction, Sports"
+    `;
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+    const keywordText = response.text.trim();
+    const keywords = keywordText.split(",").map((k) => k.trim());
+
+    const videoConditions = [];
+    const shortConditions = [];
+    const channelConditions = [];
+
+    keywords.forEach((kw) => {
+      videoConditions.push(
+        { title: { $regex: kw, $options: "i" } },
+        { description: { $regex: kw, $options: "i" } },
+        { tags: { $regex: kw, $options: "i" } },
+      );
+      shortConditions.push(
+        { title: { $regex: kw, $options: "i" } },
+        { tags: { $regex: kw, $options: "i" } },
+      );
+      channelConditions.push(
+        { name: { $regex: kw, $options: "i" } },
+        { description: { $regex: kw, $options: "i" } },
+        { category: { $regex: kw, $options: "i" } },
+      );
+    });
+    const videos = await Video.find({ $or: videoConditions }).populate(
+      "channel comments.author comments.replies.author",
+    );
+    const shorts = await Short.find({ $or: shortConditions })
+      .populate("channel", "name avatar")
+      .populate("likes", "username photoUrl");
+    const channels = await Channel.find({ $or: channelConditions })
+      .populate("owner", "username photoUrl")
+      .populate("subscribers", "username photoUrl")
+      .populate({
+        path: "videos",
+        populate: { path: "channel", select: "name avatar" },
+      })
+      .populate({
+        path: "shorts",
+        populate: { path: "channel", select: "name avatar" },
+      });
+
+    return res.status(200).json({ videos, shorts, channels, keywords });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

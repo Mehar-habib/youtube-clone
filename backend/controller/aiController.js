@@ -85,7 +85,18 @@ export const searchWithAi = async (req, res) => {
       shorts,
       playlists,
     });
-  } catch {
-    return res.status(500).json({ message: "Something went wrong" });
+  } catch (error) {
+    console.error("Search API Error:", error);
+
+    // Gemini / Google AI rate limit
+    if (error?.status === 429 || error?.code === 429) {
+      return res.status(429).json({
+        message: "AI rate limit reached. Please try again after a moment.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };

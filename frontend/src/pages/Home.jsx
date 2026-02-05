@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import logo from "../assets/youtube.png";
 import "../App.css";
 
@@ -25,6 +25,10 @@ import { useSelector } from "react-redux";
 import Profile from "../components/Profile";
 import AllVideosPage from "../components/AllVideosPage";
 import AllShortsPage from "../components/AllShortsPage";
+import { showCustomAlert } from "../components/CustomAlert";
+import axios from "axios";
+import { serverUrl } from "../App";
+import SearchResult from "../components/SearchResult";
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -35,6 +39,98 @@ export default function Home() {
   const { userData, subscribedChannels } = useSelector((state) => state.user);
   const [popup, setPopup] = useState(false);
   const [searchPopup, setSearchPopup] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [searchData, setSearchData] = useState("");
+
+  function speak(message) {
+    let utterance = new SpeechSynthesisUtterance(message);
+    window.speechSynthesis.speak(utterance);
+  }
+  const recognitionRef = useRef();
+  if (
+    !recognitionRef.current &&
+    (window.SpeechRecognition || window.webkitSpeechRecognition)
+  ) {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.continuous = false;
+    recognitionRef.current.interimResults = false;
+    recognitionRef.current.lang = "en-US";
+  }
+  const handleSearch = async () => {
+    if (!recognitionRef.current) {
+      showCustomAlert(
+        "Speech recognition is not supported in your browser",
+        "error",
+      );
+      return;
+    }
+    if (listening) {
+      recognitionRef.current.stop();
+      setListening(false);
+      return;
+    }
+    setListening(true);
+    recognitionRef.current.start();
+    recognitionRef.current.onresult = async (e) => {
+      const transcript = e.results[0][0]?.transcript.trim();
+      setInput(transcript);
+      setListening(false);
+      await handleSearchData(transcript);
+    };
+    recognitionRef.current.onerror = (err) => {
+      console.error("Recognition Error:", err);
+      setListening(false);
+      if (err.error === "no-speech") {
+        showCustomAlert("No speech detected", "error");
+      } else {
+        showCustomAlert("Speech recognition error", "error");
+      }
+    };
+    recognitionRef.current.onend = () => {
+      setListening(false);
+    };
+  };
+  const handleSearchData = async (query) => {
+    if (!query || !query.trim()) return;
+    if (loading) return;
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        serverUrl + "/api/content/search",
+        { input: query.trim() },
+        { withCredentials: true },
+      );
+      console.log(result.data);
+      setSearchData(result.data);
+      setInput("");
+      setSearchPopup(false);
+      setLoading(false);
+
+      const {
+        videos = [],
+        shorts = [],
+        playlists = [],
+        channels = [],
+      } = result.data;
+      if (
+        videos.length > 0 ||
+        shorts.length > 0 ||
+        playlists.length > 0 ||
+        channels.length > 0
+      ) {
+        speak("These are the top search results I found for you");
+      } else {
+        speak("No Result Found");
+      }
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
 
   const categories = [
     "Music",
@@ -67,22 +163,42 @@ export default function Home() {
             </button>
 
             <div className="flex flex-col items-center gap-3">
-              <h1 className="text-lg sm:text-xl font-medium text-gray-300">
-                Speak or type your query
-              </h1>
+              {listening ? (
+                <h1 className="text-xl sm:text-2xl font-semibold text-red-500 animate-pulse">
+                  Listening...
+                </h1>
+              ) : (
+                <h1 className="text-lg sm:text-xl font-medium text-gray-300">
+                  Speak or type your query
+                </h1>
+              )}
+              {/* show recognition text */}
+              {input && (
+                <span className="text-center text-lg sm:text-xl text-gray-200 px-4 py-2 rounded-lg bg-[#2a2a2a]/60">
+                  {input}
+                </span>
+              )}
 
               <div className="flex w-full gap-2 md:hidden mt-4">
                 <input
                   type="text"
                   className="flex-1 px-4 py-2 rounded-full bg-[#2a2a2a] text-white outline-none border border-gray-600 focus:border-red-400 focus:ring-2 focus:ring-red-500 transition"
                   placeholder="Type your search"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
                 />
-                <button className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full text-white font-semibold shadow-md transition disabled:opacity-50">
-                  <FaSearch />
+                <button
+                  className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full text-white font-semibold shadow-md transition disabled:opacity-50"
+                  onClick={() => handleSearchData(input)}
+                >
+                  {loading ? "Loading..." : <FaSearch />}
                 </button>
               </div>
             </div>
-            <button className="p-6 rounded-full shadow-xl transition-all duration-300 transform hover:scale-110 bg-red-500 hover:bg-red-600 shadow-red-500/40">
+            <button
+              className="p-6 rounded-full shadow-xl transition-all duration-300 transform hover:scale-110 bg-red-500 hover:bg-red-600 shadow-red-500/40"
+              onClick={handleSearch}
+            >
               <FaMicrophone size={24} />
             </button>
           </div>
@@ -113,9 +229,14 @@ export default function Home() {
                 type="text"
                 placeholder="Search"
                 className="flex-1 px-3 py-1 bg-[#1f1f1f] focus:outline-none text-white"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
               />
-              <button className="px-3 bg-[#272727]">
-                <FaSearch />
+              <button
+                className="px-3 bg-[#272727]"
+                onClick={() => handleSearchData(input)}
+              >
+                {loading ? "Loading..." : <FaSearch />}
               </button>
             </div>
             <button
@@ -302,6 +423,7 @@ export default function Home() {
             </div>
 
             <div className="mt-3">
+              {searchData && <SearchResult searchResults={searchData} />}
               <AllVideosPage />
               <AllShortsPage />
             </div>

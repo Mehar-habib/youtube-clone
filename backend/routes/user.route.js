@@ -7,6 +7,7 @@ import {
   getChannelData,
   getCurrentUser,
   getHistory,
+  getRecommendedContent,
   getSubscribedData,
   toggleSubscriber,
   updateChannel,
@@ -39,5 +40,6 @@ router.post("/toggle-subscribe", isAuth, toggleSubscriber);
 router.get("/subscribed-data", isAuth, getSubscribedData);
 router.post("/add-history", isAuth, addHistory);
 router.get("/get-history", isAuth, getHistory);
+router.get("/recommendation", isAuth, getRecommendedContent);
 
 export default router;

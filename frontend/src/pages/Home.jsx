@@ -30,6 +30,7 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import SearchResult from "../components/SearchResult";
 import FilterResult from "../components/FilterResult";
+import RecommendedContent from "./RecommendedContent";
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -471,8 +472,15 @@ export default function Home() {
               )}
               {searchData && <SearchResult searchResults={searchData} />}
               {filterData && <FilterResult filterResults={filterData} />}
-              <AllVideosPage />
-              <AllShortsPage />
+
+              {userData ? (
+                <RecommendedContent />
+              ) : (
+                <>
+                  <AllVideosPage />
+                  <AllShortsPage />
+                </>
+              )}
             </div>
           </>
         )}

@@ -138,7 +138,11 @@ export default function MobileProfile() {
           text="Liked videos"
           onClick={() => navigate("/liked-content")}
         />
-        <ProfileMenuItem icon={<SiYoutubestudio />} text="YouTube Studio" />
+        <ProfileMenuItem
+          icon={<SiYoutubestudio />}
+          text="YouTube Studio"
+          onClick={() => navigate("/yt-studio/dashboard")}
+        />
       </div>
     </div>
   );

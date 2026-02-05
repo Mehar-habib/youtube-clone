@@ -100,7 +100,26 @@ export const getChannelData = async (req, res) => {
     const channel = await Channel.findOne({ owner: userId })
       .populate("owner")
       .populate("videos")
-      .populate("shorts");
+      .populate("shorts")
+      .populate("subscribers")
+      .populate({
+        path: "communityPosts",
+        populate: {
+          path: "channel",
+          model: "Channel",
+        },
+      })
+      .populate({
+        path: "playlists",
+        populate: {
+          path: "videos",
+          model: "Video",
+          populate: {
+            path: "channel",
+            model: "Channel",
+          },
+        },
+      });
 
     if (!channel) {
       return res.status(400).json({ message: "Channel not found" });
@@ -363,15 +382,13 @@ export const getRecommendedContent = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate("channel");
 
-    return res
-      .status(200)
-      .json({
-        recommendedVideos,
-        recommendedShorts,
-        remainingVideos,
-        remainingShorts,
-        usedKeywords: allKeywords,
-      });
+    return res.status(200).json({
+      recommendedVideos,
+      recommendedShorts,
+      remainingVideos,
+      remainingShorts,
+      usedKeywords: allKeywords,
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

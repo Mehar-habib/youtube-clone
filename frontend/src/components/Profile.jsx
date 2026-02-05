@@ -34,7 +34,7 @@ export default function Profile() {
         formData,
         {
           withCredentials: true,
-        }
+        },
       );
       dispatch(setUserData(result.data));
       navigate("/");
@@ -112,7 +112,10 @@ export default function Profile() {
         </button>
 
         {userData?.channel && (
-          <button className="flex items-center gap-2 px-4 py-2 hover:bg-[#2a2a2a] transition text-white">
+          <button
+            className="flex items-center gap-2 px-4 py-2 hover:bg-[#2a2a2a] transition text-white"
+            onClick={() => navigate("/yt-studio/dashboard")}
+          >
             <SiYoutubestudio /> YT Studio
           </button>
         )}

@@ -56,7 +56,10 @@ export default function ViewChannel() {
             >
               Customize Channel
             </button>
-            <button className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded font-medium transition">
+            <button
+              className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded font-medium transition"
+              onClick={() => navigate("/yt-studio/dashboard")}
+            >
               Manage Videos
             </button>
           </div>

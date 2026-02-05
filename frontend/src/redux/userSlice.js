@@ -14,6 +14,7 @@ const userSlice = createSlice({
     historyVideo: null,
     historyShort: null,
     recommendedContent: null,
+    contentRevenue: null,
   },
   reducers: {
     setUserData: (state, action) => {
@@ -49,6 +50,9 @@ const userSlice = createSlice({
     setRecommendedContent: (state, action) => {
       state.recommendedContent = action.payload;
     },
+    setContentRevenue: (state, action) => {
+      state.contentRevenue = action.payload;
+    },
   },
 });
 
@@ -64,5 +68,6 @@ export const {
   setVideoHistory,
   setShortHistory,
   setRecommendedContent,
+  setContentRevenue,
 } = userSlice.actions; //ek action creator hai. Ye ek function return karta hai jo payload ke saath state update karega.
 export default userSlice.reducer; //ko store me add karte hain taki ye global state manage kare.

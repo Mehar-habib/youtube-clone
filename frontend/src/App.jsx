@@ -29,6 +29,11 @@ import Subscription from "./pages/subscription/Subscription";
 import GetHistory from "./customHooks/GetHistory";
 import History from "./pages/History/History";
 import GetRecommendedContent from "./customHooks/GetRecommendedContent";
+import YTStudio from "./pages/YTStudio/YTStudio";
+import Dashboard from "./components/Dashboard";
+import Analytics from "./components/Analytics";
+import Content from "./components/Content";
+import Revenue from "./components/Revenue";
 
 export const serverUrl = "http://localhost:8000";
 
@@ -206,6 +211,48 @@ export default function App() {
             </ProtectRoute>
           }
         />
+        {/* ============= */}
+        <Route
+          path="yt-studio"
+          element={
+            <ProtectRoute userData={userData}>
+              <YTStudio />
+            </ProtectRoute>
+          }
+        >
+          <Route
+            path="/yt-studio/dashboard"
+            element={
+              <ProtectRoute userData={userData}>
+                <Dashboard />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/yt-studio/analytics"
+            element={
+              <ProtectRoute userData={userData}>
+                <Analytics />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/yt-studio/content"
+            element={
+              <ProtectRoute userData={userData}>
+                <Content />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/yt-studio/revenue"
+            element={
+              <ProtectRoute userData={userData}>
+                <Revenue />
+              </ProtectRoute>
+            }
+          />
+        </Route>
       </Routes>
     </>
   );

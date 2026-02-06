@@ -23,7 +23,7 @@ export const CreatePost = async (req, res) => {
     await Channel.findByIdAndUpdate(
       channelId,
       { $push: { communityPosts: post._id } },
-      { new: true }
+      { new: true },
     );
     return res.status(200).json({
       message: "Post created successfully",
@@ -43,6 +43,25 @@ export const getAllPost = async (req, res) => {
       return res.status(400).json({ message: "posts not found" });
     }
     return res.status(200).json(posts);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+export const deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    // find post
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(400).json({ message: "post not found" });
+    }
+    // remove post reference from channel
+    await Channel.findByIdAndUpdate(post.channel, {
+      $pull: { communityPosts: post._id },
+    });
+    // delete post itself
+    await Post.findByIdAndDelete(postId);
+    return res.status(200).json({ message: "post deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

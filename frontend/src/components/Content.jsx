@@ -10,13 +10,43 @@ import {
 } from "react-icons/fa";
 import { SiYoutubeshorts } from "react-icons/si";
 import { MdDelete } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { setChannelData } from "../redux/userSlice";
+import { showCustomAlert } from "./CustomAlert";
 
 const Content = () => {
+  const dispatch = useDispatch();
   const { channelData } = useSelector((state) => state.user);
   const [activeTab, setActiveTab] = useState("Videos");
   const navigate = useNavigate();
+
+  const handleDeletePost = async (postId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this post? This action cannot be undone.",
+      )
+    )
+      return;
+    try {
+      await axios.delete(`${serverUrl}/api/content/delete-post/${postId}`, {
+        withCredentials: true,
+      });
+      // update redux state by filtering out deleted post
+      const updatedPost = channelData?.communityPosts?.filter(
+        (post) => post._id !== postId,
+      );
+      dispatch(setChannelData({ ...channelData, communityPosts: updatedPost }));
+      showCustomAlert("Post deleted successfully", "success");
+    } catch (error) {
+      showCustomAlert(
+        error.response?.data?.message || "Failed to delete post",
+        "error",
+      );
+    }
+  };
 
   const tabs = [
     {
@@ -525,7 +555,10 @@ const Content = () => {
                             </div>
                           </td>
                           <td className="py-4">
-                            <button className="p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300">
+                            <button
+                              className="p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300"
+                              onClick={() => handleDeletePost(post._id)}
+                            >
                               <MdDelete />
                             </button>
                           </td>
@@ -564,7 +597,10 @@ const Content = () => {
                                 {new Date(post.createdAt).toLocaleDateString()}
                               </span>
                             </div>
-                            <button className="p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30">
+                            <button
+                              className="p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30"
+                              onClick={() => handleDeletePost(post._id)}
+                            >
                               <MdDelete className="text-sm text-red-400" />
                             </button>
                           </div>

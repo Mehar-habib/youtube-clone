@@ -5,6 +5,8 @@ import {
   addComment,
   addReply,
   createVideo,
+  deleteVideo,
+  fetchVideo,
   getAllVideos,
   getLikedShorts,
   getLikedVideos,
@@ -13,6 +15,7 @@ import {
   toggleDisLikes,
   toggleLikes,
   toggleSave,
+  updateVideo,
 } from "../controller/videoController.js";
 import {
   addCommentForShort,
@@ -64,6 +67,14 @@ router.post("/video/:videoId/add-comment", isAuth, addComment);
 router.post("/video/:videoId/:commentId/add-reply", isAuth, addReply);
 router.get("/liked-video", isAuth, getLikedVideos);
 router.get("/saved-video", isAuth, getSavedVideos);
+router.post(
+  "/update-video/:videoId",
+  isAuth,
+  upload.single("thumbnail"),
+  updateVideo,
+);
+router.delete("/delete-video/:videoId", isAuth, deleteVideo);
+router.get("/fetch-video/:videoId", fetchVideo);
 
 // shorts routes
 router.put("/short/:shortId/toggle-like", isAuth, toggleLikesForShort);

@@ -52,6 +52,74 @@ export const createVideo = async (req, res) => {
   }
 };
 
+export const fetchVideo = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const video = await Video.findById(videoId)
+      .populate("channel", "name avatar")
+      .populate("likes", "username photoUrl");
+    if (!video) {
+      return res.status(400).json({ message: "Video not found" });
+    }
+    return res.status(200).json(video);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateVideo = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const { title, description, tags } = req.body;
+
+    // find video
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(400).json({ message: "Video not found" });
+    }
+    // update fields if provided
+    if (title) video.title = title;
+    if (description) video.description = description;
+
+    // parse tag is sent
+    if (tags) {
+      try {
+        video.tags = JSON.parse(tags);
+      } catch (error) {
+        video.tags = [];
+      }
+    }
+    // if new thumbnail uploaded (single file)
+    if (req.file) {
+      const uploadedThumbnail = await uploadOnCloudinary(req.file.path);
+      video.thumbnail = uploadedThumbnail;
+    }
+    await video.save();
+
+    return res.status(200).json(video);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+export const deleteVideo = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    // find video
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(400).json({ message: "Video not found" });
+    }
+    // remove video reference from channel
+    await Channel.findByIdAndUpdate(video.channel, {
+      $pull: { videos: video._id },
+    });
+    // delete video document
+    await Video.findByIdAndDelete(videoId);
+    return res.status(200).json({ message: "Video deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 export const getAllVideos = async (req, res) => {
   try {
     const videos = await Video.find()

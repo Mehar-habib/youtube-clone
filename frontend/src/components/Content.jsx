@@ -11,10 +11,12 @@ import {
 import { SiYoutubeshorts } from "react-icons/si";
 import { MdDelete } from "react-icons/md";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const Content = () => {
   const { channelData } = useSelector((state) => state.user);
   const [activeTab, setActiveTab] = useState("Videos");
+  const navigate = useNavigate();
 
   const tabs = [
     {
@@ -137,7 +139,14 @@ const Content = () => {
                             </div>
                           </td>
                           <td className="py-4">
-                            <button className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition-colors">
+                            <button
+                              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition-colors"
+                              onClick={() =>
+                                navigate(
+                                  `/yt-studio/update-video/${video?._id}`,
+                                )
+                              }
+                            >
                               <FaEdit />
                             </button>
                           </td>
@@ -179,7 +188,14 @@ const Content = () => {
                                 </span>
                               </div>
                             </div>
-                            <button className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700">
+                            <button
+                              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700"
+                              onClick={() =>
+                                navigate(
+                                  `/yt-studio/update-video/${video?._id}`,
+                                )
+                              }
+                            >
                               <FaEdit className="text-sm" />
                             </button>
                           </div>

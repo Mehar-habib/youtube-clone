@@ -34,6 +34,70 @@ export const CreatePlaylist = async (req, res) => {
   }
 };
 
+export const fetchPlaylist = async (req, res) => {
+  try {
+    const { playlistId } = req.params;
+    const playlist = await Playlist.findById(playlistId)
+      .populate("channel", "name avatar")
+      .populate({
+        path: "videos",
+        populate: { path: "channel", select: "name avatar" },
+      });
+    if (!playlist) {
+      return res.status(400).json({ message: "Playlist not found" });
+    }
+    return res.status(200).json(playlist);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+export const updatePlaylist = async (req, res) => {
+  try {
+    const { playlistId } = req.params;
+    const { title, description, addVideos = [], removeVideos = [] } = req.body;
+    const playlist = await Playlist.findById(playlistId);
+    if (!playlist) {
+      return res.status(400).json({ message: "Playlist not found" });
+    }
+    // update title and description
+    if (title) playlist.title = title;
+    if (description) playlist.description = description;
+
+    // Add videos (Avoid duplicates)
+    playlist.videos.push(...addVideos);
+    playlist.videos = [
+      ...new Set(playlist.videos.map((video) => video.toString())),
+    ];
+
+    // Remove videos
+    playlist.videos = playlist.videos.filter(
+      (video) => !removeVideos.includes(video.toString()),
+    );
+
+    await playlist.save();
+    return res.status(200).json(playlist);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+export const deletePlaylist = async (req, res) => {
+  try {
+    const { playlistId } = req.params;
+    const playlist = await Playlist.findById(playlistId);
+    if (!playlist) {
+      return res.status(400).json({ message: "Playlist not found" });
+    }
+    // remove playlist reference from channel
+    await Channel.findByIdAndUpdate(playlist.channel, {
+      $pull: { playlists: playlist._id },
+    });
+    // delete playlist
+    await Playlist.findByIdAndDelete(playlistId);
+    return res.status(200).json({ message: "Playlist deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 export const toggleSavePlaylist = async (req, res) => {
   try {
     const { playlistId } = req.body;

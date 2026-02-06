@@ -33,8 +33,11 @@ import {
 } from "../controller/shortController.js";
 import {
   CreatePlaylist,
+  deletePlaylist,
+  fetchPlaylist,
   getSavedPlaylist,
   toggleSavePlaylist,
+  updatePlaylist,
 } from "../controller/playListController.js";
 import {
   addCommentForPost,
@@ -96,6 +99,9 @@ router.get("/fetch-short/:shortId", fetchShort);
 router.post("/create-playlist", isAuth, CreatePlaylist);
 router.post("/playlist/toggle-save", isAuth, toggleSavePlaylist);
 router.get("/saved-playlist", isAuth, getSavedPlaylist);
+router.post("/update-playlist/:playlistId", isAuth, updatePlaylist);
+router.delete("/delete-playlist/:playlistId", isAuth, deletePlaylist);
+router.get("/fetch-playlist/:playlistId", fetchPlaylist);
 
 // Posts routes
 router.post("/create-post", isAuth, upload.single("image"), CreatePost);

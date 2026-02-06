@@ -265,7 +265,14 @@ const Content = () => {
                             </div>
                           </td>
                           <td className="py-4">
-                            <button className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white">
+                            <button
+                              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white"
+                              onClick={() =>
+                                navigate(
+                                  `/yt-studio/update-short/${short?._id}`,
+                                )
+                              }
+                            >
                               <FaEdit />
                             </button>
                           </td>
@@ -307,7 +314,14 @@ const Content = () => {
                                 </span>
                               </div>
                             </div>
-                            <button className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700">
+                            <button
+                              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700"
+                              onClick={() =>
+                                navigate(
+                                  `/yt-studio/update-short/${short?._id}`,
+                                )
+                              }
+                            >
                               <FaEdit className="text-sm" />
                             </button>
                           </div>

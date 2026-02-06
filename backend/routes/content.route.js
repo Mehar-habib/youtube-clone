@@ -21,12 +21,15 @@ import {
   addCommentForShort,
   addReplyForShort,
   createShort,
+  deleteShort,
+  fetchShort,
   getAllShorts,
   getSavedShorts,
   getViewsForShort,
   toggleDisLikesForShort,
   toggleLikesForShort,
   toggleSaveForShort,
+  updateShort,
 } from "../controller/shortController.js";
 import {
   CreatePlaylist,
@@ -85,6 +88,9 @@ router.post("/short/:shortId/add-comment", isAuth, addCommentForShort);
 router.post("/short/:shortId/:commentId/add-reply", isAuth, addReplyForShort);
 router.get("/liked-short", isAuth, getLikedShorts);
 router.get("/saved-short", isAuth, getSavedShorts);
+router.post("/update-short/:shortId", isAuth, updateShort);
+router.delete("/delete-short/:shortId", isAuth, deleteShort);
+router.get("/fetch-short/:shortId", fetchShort);
 
 // Playlist Route
 router.post("/create-playlist", isAuth, CreatePlaylist);

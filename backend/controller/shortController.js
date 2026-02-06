@@ -36,6 +36,62 @@ export const createShort = async (req, res) => {
   }
 };
 
+export const fetchShort = async (req, res) => {
+  try {
+    const { shortId } = req.params;
+    const short = await Short.findById(shortId)
+      .populate("channel", "name avatar")
+      .populate("likes", "userName photoUrl");
+    if (!short) {
+      return res.status(400).json({ message: "Short not found" });
+    }
+    return res.status(200).json(short);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+export const updateShort = async (req, res) => {
+  try {
+    const { shortId } = req.params;
+    const { title, description, tags } = req.body;
+
+    const short = await Short.findById(shortId);
+    if (!short) {
+      return res.status(400).json({ message: "Short not found" });
+    }
+    if (title) short.title = title;
+    if (description) short.description = description;
+    if (tags) {
+      try {
+        short.tags = JSON.parse(tags);
+      } catch (error) {
+        short.tags = [];
+      }
+    }
+    await short.save();
+    return res.status(200).json(short);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+export const deleteShort = async (req, res) => {
+  try {
+    const { shortId } = req.params;
+
+    const short = await Short.findById(shortId);
+    if (!short) {
+      return res.status(400).json({ message: "Short not found" });
+    }
+    // remove reference from channel
+    await Channel.findByIdAndUpdate(short.channel, {
+      $pull: { shorts: short._id },
+    });
+    await Short.findByIdAndDelete(shortId);
+    return res.status(200).json({ message: "Short deleted" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 export const getAllShorts = async (req, res) => {
   try {
     const shorts = await Short.find()

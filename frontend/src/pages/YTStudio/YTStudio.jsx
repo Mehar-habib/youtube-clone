@@ -53,7 +53,10 @@ const YTStudio = () => {
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
-            <button className="hidden md:flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors">
+            <button
+              className="hidden md:flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors"
+              onClick={() => navigate("/create")}
+            >
               <FaPlusCircle />
               <span>Create</span>
             </button>

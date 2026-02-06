@@ -35,6 +35,7 @@ import Analytics from "./components/Analytics";
 import Content from "./components/Content";
 import Revenue from "./components/Revenue";
 import UpdateVideo from "./pages/Videos/UpdateVideo";
+import UpdateShort from "./pages/Shorts/UpdateShort";
 
 export const serverUrl = "http://localhost:8000";
 
@@ -258,6 +259,14 @@ export default function App() {
             element={
               <ProtectRoute userData={userData}>
                 <UpdateVideo />
+              </ProtectRoute>
+            }
+          />
+          <Route
+            path="/yt-studio/update-short/:shortId"
+            element={
+              <ProtectRoute userData={userData}>
+                <UpdateShort />
               </ProtectRoute>
             }
           />

@@ -39,7 +39,14 @@ export default function ShortCard({
           <p className="text-xs text-gray-400 truncate">{channelName}</p>
         </div>
 
-        <p className="text-xs text-gray-400 mt-1">{views || 0} views</p>
+        <p className="text-xs text-gray-400 mt-1">
+          {Number(views) >= 1_000_000
+            ? Math.floor(Number(views) / 1_000_000) + "M"
+            : Number(views) >= 1_000
+              ? Math.floor(Number(views) / 1_000) + "K"
+              : Number(views) || 0}{" "}
+          views
+        </p>
       </div>
     </div>
   );

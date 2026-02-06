@@ -48,7 +48,14 @@ export default function VideoCard({
             {channelName}
           </p>
 
-          <p className="text-gray-400 text-xs mt-0.5">{views || 0} views</p>
+          <p className="text-gray-400 text-xs mt-0.5">
+            {Number(views) >= 1_000_000
+              ? Math.floor(Number(views) / 1_000_000) + "M"
+              : Number(views) >= 1_000
+                ? Math.floor(Number(views) / 1_000) + "K"
+                : Number(views) || 0}
+            views
+          </p>
         </div>
       </div>
     </div>

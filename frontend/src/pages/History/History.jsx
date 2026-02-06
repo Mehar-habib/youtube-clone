@@ -52,12 +52,12 @@ const History = () => {
               return (
                 <div key={s._id} className="shrink-0">
                   <ShortCard
-                    shortUrl={short.shortUrl}
-                    title={short.title}
-                    channelName={short.channel?.name}
-                    views={short.views}
-                    id={short._id}
-                    avatar={short.channel?.avatar}
+                    shortUrl={short?.shortUrl}
+                    title={short?.title}
+                    channelName={short?.channel?.name}
+                    views={short?.views}
+                    id={short?._id}
+                    avatar={short?.channel?.avatar}
                   />
                 </div>
               );
@@ -82,13 +82,13 @@ const History = () => {
               return (
                 <div key={video._id} className="shrink-0">
                   <VideoCard
-                    thumbnail={v.thumbnail}
+                    thumbnail={v?.thumbnail}
                     duration={duration[v._id] || "0:00"}
-                    channelLogo={v.channel?.avatar}
-                    title={v.title}
-                    channelName={v.channel?.name}
-                    views={v.views}
-                    id={v._id}
+                    channelLogo={v?.channel?.avatar}
+                    title={v?.title}
+                    channelName={v?.channel?.name}
+                    views={v?.views}
+                    id={v?._id}
                   />
                 </div>
               );
